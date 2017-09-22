@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.home.dao.HomeDao">
+	<!-- 获取登录用户首页统计模块id数组列表 -->
+	<select id="findUserStatiIds" resultType="String" >
+		SELECT
+			rs.statiIds
+		FROM sys_role_statis rs
+		WHERE rs.roleId in
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">  
+		  #{item}
+		</foreach>
+	</select>
+	
+	<!-- 获取登录用户首页统计模块列表 -->
+	<select id="findUserStatiList" resultType="Stati" >
+		SELECT
+			s.id,
+		  	s.statiKey,
+		  	s.statiName,
+		  	s.icon,
+		  	s.unit,
+		  	s.groupFlag,
+		  	s.color
+		FROM sys_stati s
+		WHERE s.statiKey in
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">  
+		  #{item}
+		</foreach>
+	</select>
+	
+	<!-- 获取库存档案数量 -->
+	<select id="findLibArchiveCount" resultType="int" >
+		select sum(num) from (
+			select
+				count(1) as num
+			from archive a,sys_office o
+			where a.status in ('readyshelf','inlibrary','outlibrary','readyout','waitdestory') and a.createDept = o.code
+			${dsf}
+			union all
+			select
+				count(1) 
+			from warrant w,archive a,archive_warrant aw,sys_office o
+			where w.status in ('readyshelf','inlibrary','outlibrary','readyout') and w.id=aw.warrantId and aw.hostLinkNo = a.hostLinkNo and a.createDept = o.code
+			${dsf}
+		) as temp
+	</select>
+	
+	<!-- 获取借阅档案数量 -->
+	<select id="findBorrowArchiveCount" resultType="int" >
+		SELECT 
+			COUNT(DISTINCT a.archiveId) num
+		FROM
+		  	borrow_detail a,
+		  	borrow_list b,
+		  	sys_office o
+		WHERE a.status = 'delivered' 
+		  	AND b.borrowType = '04' 
+		  	AND b.approveStatus = 'approvePass' 
+		  	AND b.renewStatus = '0' 
+		  	AND a.borrowListNo = b.borrowListNo
+		  	AND b.createDept = o.code
+		  	${dsf} 
+	</select>
+	
+	<!-- 获取已移交档案成功数量 -->
+	<select id="findTransArchiveCount" resultType="int" >
+		SELECT 
+		  	COUNT(1) 
+		FROM
+		  	transfer_detail d,
+		  	transfer_list l,
+		  	sys_office o 
+		WHERE d.verifyStatus = '1'
+		AND d.transferListNo = l.transferListNo
+		AND l.createDept = o.code
+		${dsf}
+	</select>
+	
+	<!-- 获取销毁档案数量 -->
+	<select id="findDestroyCount" resultType="int" >
+		SELECT 
+	      COUNT(1) as num
+	    FROM
+	      archive a,
+	      sys_office o 
+	    WHERE a.status = 'destory' and a.createDept = o.code
+	    ${dsf}
+	</select>
+	
+	<!-- 获取库管待上架数量 -->
+	<select id="findReadyShelfCount" resultType="int" >
+		SELECT 
+		  SUM(num) 
+		FROM
+		  (SELECT 
+		    COUNT(1) num 
+		  FROM
+		    archive a,
+		    sys_office o  
+		  WHERE a.status = 'readyshelf'
+		  AND a.createDept = o.code
+		  ${dsf}
+		  UNION
+		  ALL 
+		  SELECT 
+		    COUNT(1) num 
+		  FROM
+		    warrant w,archive a,archive_warrant aw,sys_office o
+		  WHERE w.status = 'readyshelf'
+		  AND w.id=aw.warrantId AND aw.hostLinkNo = a.hostLinkNo AND a.createDept = o.code
+		  ${dsf}
+		  ) AS temp
+	</select>
+	
+	<!-- 获取库管待接收数量 -->
+	<select id="findStoreReadyReceiveCount" resultType="int" >
+		SELECT 
+		  COUNT(1) 
+		FROM
+		  transfer_detail t,
+		  transfer_list l,
+		  sys_office o
+		WHERE t.verifyStatus = '1' 
+		AND t.storeReceiveStatus = 0
+		AND t.transferListNo = l.transferListNo and l.createDept = o.code
+		${dsf}
+	</select>
+	
+	<!-- 获取借阅待下架档案数量 -->
+	<select id="findWaitOutCount" resultType="int" >
+		SELECT 
+		  COUNT(1) 
+		FROM
+		  borrow_list l,
+		  borrow_detail d,
+		  sys_office o 
+		WHERE l.borrowListNo = d.borrowListNo 
+		  AND l.renewStatus = '0' 
+		  AND l.approveStatus IN ('approving', 'approvePass') 
+		  AND d.status = 'waitout'
+		  AND l.createDept = o.code
+		  ${dsf}
+	</select>
+	
+	<!-- 获取借阅待交付档案数量 -->
+	<select id="findWaitDeliveryCount" resultType="int" >
+		SELECT 
+		  COUNT(1) 
+		FROM
+		  borrow_detail d,
+		  borrow_list l,
+		  sys_office o  
+		WHERE d.status = 'waitdelivery' 
+		  AND d.borrowListNo = l.borrowListNo
+		  AND l.approveStatus IN ('approving', 'approvePass')
+		  AND l.createDept = o.code
+		  ${dsf}
+	</select>
+	
+	<!-- 获取接收档案数量 -->
+	<select id="findReceiveArcNum" resultType="int" >
+		SELECT 
+		  COUNT(1) num 
+		FROM
+		  transfer_detail d,
+		  transfer_list l,
+		  sys_office o 
+		WHERE d.receiveStatus = '1' 
+		AND d.transferListNo = l.transferListNo
+		AND l.createDept = o.code
+		${dsf}
+	</select>
+	
+	<!-- 获取接收退回档案数量 -->
+	<select id="findReceiveBackNum" resultType="int" >
+		SELECT 
+		  COUNT(1) num 
+		FROM
+		  transfer_detail d,
+		  transfer_list l,
+		  sys_office o  
+		WHERE d.receiveStatus = '0'
+		  AND d.transferListNo = l.transferListNo
+		  AND l.createDept = o.code
+		  ${dsf}
+	</select>
+	
+	<!-- 获取审核通过档案数量 -->
+	<select id="findVerifyPassArcNum" resultType="int" >
+		SELECT 
+		  COUNT(1) 
+		FROM
+		  transfer_detail d,
+		  work_assignment w,
+		  transfer_list l,
+		  sys_office o  
+		WHERE d.verifyStatus = '1' 
+		  AND d.transferListNo = w.transferListNo 
+		  AND w.handler = #{userId}
+		  AND d.transferListNo = l.transferListNo
+		  AND l.createDept = o.code
+		  ${dsf}
+	</select>
+	
+	<!-- 获取审核退回档案数量 -->
+	<select id="findVerifyBackArcNum" resultType="int" >
+		SELECT 
+		  COUNT(1) 
+		FROM
+		  transfer_detail d,
+		  work_assignment w,
+		  transfer_list l,
+		  sys_office o  
+		WHERE d.verifyStatus = '0' 
+		  AND d.transferListNo = w.transferListNo 
+		  AND w.handler = #{userId}
+		  AND d.transferListNo = l.transferListNo
+		  AND l.createDept = o.code
+		  ${dsf}
+	</select>
+</mapper>

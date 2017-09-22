@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.digital.dao.WorkRateDao">
+    
+	<select id="get" resultType="WorkRate">
+		SELECT 
+			a.id AS "id",
+			a.del_flag AS "delFlag",
+			a.create_by AS "createBy.id",
+			a.create_date AS "createDate",
+			a.update_by AS "updateBy.id",
+			a.update_date AS "updateDate",
+			a.create_by AS "user.id"
+		FROM y_archivecollect a
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findUseList" resultType="WorkRate">
+		SELECT 
+			'利用' AS workType,
+			count(detail.id) AS workNum,
+ 			CAST(CONVERT(varchar(100),a.create_date,23) AS DATE) AS "date",
+			'件' AS workUnit
+		FROM y_archive_use a, y_archive_use_detail detail 
+		WHERE a.id = detail.applyid
+			<if test="date != null and date != ''">
+				<![CDATA[
+				and CAST(CONVERT(varchar(100),a.create_date,23) AS DATE) >= DATEADD(mm, DATEDIFF(mm,0,#{date}), 0)
+				and CAST(CONVERT(varchar(100),a.create_date,23) AS DATE) <= DATEADD(ms,-3,DATEADD(mm, DATEDIFF(m,0,#{date})+1, 0))
+				]]>
+			</if>
+		GROUP BY CONVERT(varchar(100),a.create_date,23)
+		ORDER BY CONVERT(varchar(100),a.create_date,23) DESC
+	</select>
+	
+	<select id="findCollectList" resultType="WorkRate">
+		SELECT 
+			a.type AS workType,
+			sum(a.incount) AS workNum,
+			a.create_date AS "date",
+			(select dict.label from sys_dict dict where dict.value = a.unit and dict.type='ZJSLDW' ) AS workUnit
+		FROM y_archivecollect a
+		where 1=1 
+			<if test="workType != null and workType != ''">
+				and a.type = #{workType}
+			</if>
+			<if test="date != null and date != ''">
+				<![CDATA[
+				and a.create_date >= DATEADD(mm, DATEDIFF(mm,0,#{date}), 0)
+				and a.create_date <= DATEADD(ms,-3,DATEADD(mm, DATEDIFF(m,0,#{date})+1, 0))
+				]]>
+			</if>
+		GROUP BY a.create_date,a.type,a.unit
+		ORDER BY a.create_date DESC
+	</select>
+	
+	<select id="findborrowList" resultType="WorkRate">
+	SELECT 
+			'借阅' AS workType,
+			count(detail.id) AS workNum,
+ 			CAST(CONVERT(varchar(100),a.create_date,23) AS DATE) AS "date",
+			'件' AS workUnit
+		FROM y_borrowapply a, y_borrowapply_detail detail
+		WHERE a.id = detail.apply_id
+			<if test="date != null and date != ''">
+				<![CDATA[
+				and CAST(CONVERT(varchar(100),a.create_date,23) AS DATE) >= DATEADD(mm, DATEDIFF(mm,0,#{date}), 0)
+				and CAST(CONVERT(varchar(100),a.create_date,23) AS DATE) <= DATEADD(ms,-3,DATEADD(mm, DATEDIFF(m,0,#{date})+1, 0))
+				]]>
+			</if>
+		GROUP BY CONVERT(varchar(100),a.create_date,23)
+		ORDER BY CONVERT(varchar(100),a.create_date,23) DESC
+	</select>
+	
+	<select id="findAuthList" resultType="WorkRate">
+		SELECT 
+			a.type AS workType,
+			sum(a.amount) AS workNum,
+			a.create_date AS "date",
+			'件' AS workUnit
+		FROM y_archiveauth a
+		where 1=1
+			<if test="workType != null and workType != ''">
+				and a.type = #{workType}
+			</if>
+			<if test="date != null and date != ''">
+				<![CDATA[
+				and a.create_date >= DATEADD(mm, DATEDIFF(mm,0,#{date}), 0)
+				and a.create_date <= DATEADD(ms,-3,DATEADD(mm, DATEDIFF(m,0,#{date})+1, 0))
+				]]>
+			</if>
+		GROUP BY a.create_date,a.type
+		ORDER BY a.create_date DESC
+	</select>
+	
+	<select id="findTransferList" resultType="WorkRate">
+		SELECT 
+			'移交' AS workType,
+			sum(a.outcount) AS workNum,
+ 			CAST(CONVERT(varchar(100),a.enterdate,23) AS DATE) AS "date",
+			'件' AS workUnit
+		FROM y_archiveaccept a
+		where 1=1
+			<if test="date != null and date != ''">
+				<![CDATA[
+				and CAST(CONVERT(varchar(100),a.enterdate,23) AS DATE) >= DATEADD(mm, DATEDIFF(mm,0,#{date}), 0)
+				and CAST(CONVERT(varchar(100),a.enterdate,23) AS DATE) <= DATEADD(ms,-3,DATEADD(mm, DATEDIFF(m,0,#{date})+1, 0))
+				]]>
+			</if>
+		GROUP BY CONVERT(varchar(100),a.enterdate,23)
+		ORDER BY CONVERT(varchar(100),a.enterdate,23) DESC
+	</select>
+	
+	<!-- 获取某个月往前12个月的数据的单位 -->
+	<select id="getWorkRateUnit" resultType="java.util.HashMap">
+	<![CDATA[
+	SELECT a.unit,
+		(select dict.label from sys_dict dict where dict.value = a.unit and dict.type='ZJSLDW' ) AS workUnit
+		FROM y_archivecollect a
+	where a.create_date >= DATEADD(mm, DATEDIFF(mm,0,#{date})-12, 0)
+		and a.create_date <= DATEADD(ms,-3,DATEADD(mm, DATEDIFF(m,0,#{date})+1, 0))
+	GROUP BY a.unit
+	]]>
+	</select>
+	
+	<select id="getWorkRate1" resultType="java.lang.Integer">
+		<include refid="selectWorkRateByDate3"></include>
+		<![CDATA[
+		SELECT top 12
+			sum(a.incount) AS dataNum,
+		a.unit,
+		CONVERT(VARCHAR(7),a.create_date,21) as yearMonth,
+		(select dict.label from sys_dict dict where dict.value = a.unit and dict.type='ZJSLDW' ) AS workUnit
+		FROM y_archivecollect a
+		where a.unit = #{workUnit}
+		and a.type = #{workType}
+		and a.create_date <= #{deptName}
+		GROUP BY CONVERT(VARCHAR(7),a.create_date,21),a.unit
+		ORDER BY CONVERT(VARCHAR(7),a.create_date,21) DESC
+		]]>
+		<include refid="selectWorkRateByDate2"></include>
+	</select>
+	
+	<select id="getWorkRate1Date" resultType="String">
+		<include refid="selectWorkRateByDate4"></include>
+	</select>
+	<select id="getWorkRate2" resultType="java.lang.Integer">
+		<include refid="selectWorkRateByDate5"></include>
+		<![CDATA[
+		SELECT top 12
+			count(detail.id) AS dataNum,
+ 			CONVERT(varchar(7),a.create_date,23) as yearMonth
+		FROM y_archive_use a, y_archive_use_detail detail 
+		WHERE a.id = detail.applyid
+				and CAST(CONVERT(varchar(20),a.create_date,23) AS DATE) >= DATEADD(yy, DATEDIFF(yy,0,#{date}), 0)
+				and CAST(CONVERT(varchar(20),a.create_date,23) AS DATE) <= dateadd(ms,-3,DATEADD(yy,DATEDIFF(yy,0,#{date})+1,0))
+		GROUP BY CONVERT(varchar(7),a.create_date,23)
+		ORDER BY CONVERT(varchar(7),a.create_date,23) DESC
+		]]>
+		<include refid="selectWorkRateByDate2"></include>
+	</select>
+	
+	<select id="getWorkRate3Date" resultType="String">
+		<include refid="selectWorkRateByDate6"></include>
+	</select>
+	
+	<select id="getWorkRate3" resultType="java.lang.Integer">
+		<include refid="selectWorkRateByDate7"></include>
+		<![CDATA[
+		SELECT top 5
+			sum(a.amount) AS dataNum,
+			convert(varchar(4),a.create_date,21) as yearMonth
+		FROM y_archiveauth a
+		where 1=1
+			and a.type = #{workType}
+			and CAST(CONVERT(varchar(20),a.create_date,23) AS DATE) >= DATEADD(yy, DATEDIFF(yy,0,#{date})-4, 0) 
+			and CAST(CONVERT(varchar(20),a.create_date,23) AS DATE) <= dateadd(ms,-3,DATEADD(yy,DATEDIFF(yy,0,#{date})+1,0))
+		GROUP BY convert(varchar(4),a.create_date,21)
+		ORDER BY convert(varchar(4),a.create_date,21) DESC
+		]]>
+		<include refid="selectWorkRateByDate2"></include>
+	</select>
+	
+	<select id="getWorkRate4" resultType="java.lang.Integer">
+		<include refid="selectWorkRateByDate7"></include>
+		<![CDATA[
+		SELECT top 5 
+			sum(a.outcount) AS dataNum,
+ 			CONVERT(varchar(4),a.enterdate,23) as yearMonth
+		FROM y_archiveaccept a
+		where 1=1
+				and CAST(CONVERT(varchar(20),a.enterdate,23) AS DATE) >= DATEADD(yy, DATEDIFF(yy,0,#{date})-4, 0) 
+				and CAST(CONVERT(varchar(20),a.enterdate,23) AS DATE) <= dateadd(ms,-3,DATEADD(yy,DATEDIFF(yy,0,#{date})+1,0))
+		GROUP BY CONVERT(varchar(4),a.enterdate,23)
+		ORDER BY CONVERT(varchar(4),a.enterdate,23) DESC
+		]]>
+		<include refid="selectWorkRateByDate2"></include>
+	</select>
+	
+	<select id="getWorkRate5" resultType="java.lang.Integer">
+		<include refid="selectWorkRateByDate7"></include>
+		<![CDATA[
+		SELECT top 5 
+			count(detail.id) AS dataNum,
+ 			CONVERT(varchar(4),a.create_date,23) as yearMonth
+		FROM y_borrowapply a, y_borrowapply_detail detail 
+		WHERE a.id = detail.apply_id
+			and CAST(CONVERT(varchar(20),a.create_date,23) AS DATE) >= DATEADD(yy, DATEDIFF(yy,0,#{date})-4, 0) 
+			and CAST(CONVERT(varchar(20),a.create_date,23) AS DATE) <= dateadd(ms,-3,DATEADD(yy,DATEDIFF(yy,0,#{date})+1,0))
+		GROUP BY CONVERT(varchar(4),a.create_date,23)
+		ORDER BY CONVERT(varchar(4),a.create_date,23) DESC
+		]]>
+		<include refid="selectWorkRateByDate2"></include>
+	</select>
+	
+	<sql id="selectWorkRateByDate1">
+		select b.yearMonth,
+		ISNULL(c.dataNum, 0) as dataNum
+		from
+			(select YEAR(GetDate()) as yearMonth
+			UNION
+			select YEAR(GetDate())-1 as yearMonth
+			UNION
+			select YEAR(GetDate())-2 as yearMonth
+			UNION
+			select YEAR(GetDate())-3 as yearMonth
+			UNION
+			select YEAR(GetDate())-4 as yearMonth) b
+		LEFT JOIN (
+	</sql>	
+	
+	<sql id="selectWorkRateByDate2">
+		) c
+		on b.yearMonth = c.yearMonth
+		order by b.yearMonth
+	</sql>
+	
+	<sql id="selectWorkRateByDate3">
+		select 
+		ISNULL(c.dataNum, 0) as dataNum
+		from (
+		<include refid="selectWorkRateByDate4"></include>
+		) b
+		LEFT JOIN (
+	</sql>
+	
+	<sql id="selectWorkRateByDate4">
+		select convert(varchar(7),dateadd(month,0,#{date}),21) as yearMonth
+		UNION
+		select convert(varchar(7),dateadd(month,-1,#{date}),21) as yearMonth
+		UNION
+		select convert(varchar(7),dateadd(month,-2,#{date}),21) as yearMonth
+		UNION
+		select convert(varchar(7),dateadd(month,-3,#{date}),21) as yearMonth
+		UNION
+		select convert(varchar(7),dateadd(month,-4,#{date}),21) as yearMonth
+		UNION
+		select convert(varchar(7),dateadd(month,-5,#{date}),21) as yearMonth
+		UNION
+		select convert(varchar(7),dateadd(month,-6,#{date}),21) as yearMonth
+		UNION
+		select convert(varchar(7),dateadd(month,-7,#{date}),21) as yearMonth
+		UNION
+		select convert(varchar(7),dateadd(month,-8,#{date}),21) as yearMonth
+		UNION
+		select convert(varchar(7),dateadd(month,-9,#{date}),21) as yearMonth
+		UNION
+		select convert(varchar(7),dateadd(month,-10,#{date}),21) as yearMonth
+		UNION
+		select convert(varchar(7),dateadd(month,-11,#{date}),21) as yearMonth
+	</sql>
+	
+	<sql id="selectWorkRateByDate5">		
+		select 
+		ISNULL(c.dataNum, 0) as dataNum
+		from (
+		select convert(varchar(50),DATEPART(YEAR,#{date}))+'-01' as yearMonth
+		UNION
+		select convert(varchar(50),DATEPART(YEAR,#{date}))+'-02' as yearMonth
+		UNION
+		select convert(varchar(50),DATEPART(YEAR,#{date}))+'-03' as yearMonth
+		UNION
+		select convert(varchar(50),DATEPART(YEAR,#{date}))+'-04' as yearMonth
+		UNION
+		select convert(varchar(50),DATEPART(YEAR,#{date}))+'-05' as yearMonth
+		UNION
+		select convert(varchar(50),DATEPART(YEAR,#{date}))+'-06' as yearMonth
+		UNION
+		select convert(varchar(50),DATEPART(YEAR,#{date}))+'-07' as yearMonth
+		UNION
+		select convert(varchar(50),DATEPART(YEAR,#{date}))+'-08' as yearMonth
+		UNION
+		select convert(varchar(50),DATEPART(YEAR,#{date}))+'-09' as yearMonth
+		UNION
+		select convert(varchar(50),DATEPART(YEAR,#{date}))+'-10' as yearMonth
+		UNION
+		select convert(varchar(50),DATEPART(YEAR,#{date}))+'-11' as yearMonth
+		UNION
+		select convert(varchar(50),DATEPART(YEAR,#{date}))+'-12' as yearMonth
+		) b
+		LEFT JOIN (
+	</sql>
+	<sql id="selectWorkRateByDate6">
+		select convert(varchar(4),dateadd(year,0,#{date}),21) as yearMonth
+		UNION
+		select convert(varchar(4),dateadd(year,-1,#{date}),21) as yearMonth
+		UNION
+		select convert(varchar(4),dateadd(year,-2,#{date}),21) as yearMonth
+		UNION
+		select convert(varchar(4),dateadd(year,-3,#{date}),21) as yearMonth
+		UNION
+		select convert(varchar(4),dateadd(year,-4,#{date}),21) as yearMonth
+	</sql>
+	<sql id="selectWorkRateByDate7">
+		select 
+		ISNULL(c.dataNum, 0) as dataNum
+		from (
+		<include refid="selectWorkRateByDate6"></include>
+		) b
+		LEFT JOIN (
+	</sql>
+
+</mapper>

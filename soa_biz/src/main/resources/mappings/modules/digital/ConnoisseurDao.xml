@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.digital.dao.ConnoisseurDao">
+	<select id="getPage" resultType="Connoisseur" parameterType="java.lang.Object" statementType="STATEMENT">
+		SELECT TOP ${currentRows} 
+		id,
+		name as name,
+		phone,
+		email,
+		createtime,
+		workflowtype
+		 FROM 
+			jy_supervision_view 
+			WHERE id NOT IN (
+ 		 		SELECT TOP ${currentNum} id 
+ 		 		FROM 
+			jy_supervision_view
+			)  
+	
+		order by createtime desc
+	</select>
+	<select id="findCount" resultType="int">
+	SELECT
+			count(id)
+		FROM
+			jy_supervision_view
+	</select>
+</mapper>

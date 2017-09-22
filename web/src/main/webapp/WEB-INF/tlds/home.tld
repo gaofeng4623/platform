@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+  version="2.0">
+    
+  <description>JSTL 1.1 functions library</description>
+  <display-name>JSTL functions home</display-name>
+  <tlib-version>1.1</tlib-version>
+  <short-name>home</short-name>
+  <uri>http://java.sun.com/jsp/jstl/functionss</uri>
+
+   <function>
+    <description>查询报警服务</description>
+    <name>getNewAlarms</name>
+    <function-class>com.gtzn.modules.tag.util.HomeUtils</function-class>
+    <function-signature>java.util.List getNewAlarms()</function-signature>
+    <example>${home:getNewAlarms()}</example>
+   </function>
+
+   <function>
+    <description>获取通知公告部分</description>
+    <name>findTopN</name>
+    <function-class>com.gtzn.modules.tag.util.HomeUtils</function-class>
+    <function-signature>java.util.List findTopN()</function-signature>
+    <example>${home:findTopN()}</example>
+  </function>
+  
+  <function>
+    <description>获取档案利用指南部分</description>
+    <name>findDocCheck</name>
+    <function-class>com.gtzn.modules.tag.util.HomeUtils</function-class>
+    <function-signature>java.util.List findDocCheck()</function-signature>
+    <example>${home:findDocCheck()}</example>
+  </function>
+  
+  <function>
+    <description>部门进度跟踪部分</description>
+    <name>findWorkRate</name>
+    <function-class>com.gtzn.modules.tag.util.HomeUtils</function-class>
+    <function-signature>java.util.List findWorkRate()</function-signature>
+    <example>${home:findWorkRate()}</example>
+  </function>
+  
+  <function>
+    <description>最新采集</description>
+    <name>findCollect</name>
+    <function-class>com.gtzn.modules.tag.util.HomeUtils</function-class>
+    <function-signature>java.util.List findCollect()</function-signature>
+    <example>${home:findCollect()}</example>
+  </function>
+
+</taglib>

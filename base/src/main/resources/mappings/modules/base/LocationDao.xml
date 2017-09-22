@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.base.dao.LocationDao">
+    
+	<sql id="locationColumns">
+		a.id,
+		a.branchid AS "branchId",
+		a.locationname AS "locationName",
+		a.parentid AS "parent.id",
+		a.rfid,
+		a.locationpath AS "locationPath",
+		a.locationpathgrid AS "locationPathGrid",
+		a.gridno AS "gridNo",
+		a.locationtype AS "locationType",
+		a.serialno AS "serialNo",
+		a.serialnopath AS "serialNoPath",
+		a.filetype AS "fileType",
+		p.locationname AS "parent.locationName",
+		sd.label AS "locationTypeName"
+	</sql>
+	
+	<sql id="locationJoins">
+		LEFT JOIN location p ON p.id = a.parentid
+		LEFT JOIN sys_dict sd ON (a.locationtype = sd.value AND sd.type = 'location_type')
+		LEFT JOIN sys_office o ON o.code = a.branchid
+	</sql>
+    
+	<select id="get" resultType="Location">
+		SELECT 
+			<include refid="locationColumns"/>
+		FROM location a
+		<include refid="locationJoins"/>
+		WHERE a.id = #{id} 
+	</select>
+	
+	<select id="findPage" resultType="Location">
+		SELECT 
+			<include refid="locationColumns"/>
+		FROM location a
+		<include refid="locationJoins"/>
+		<where> 
+			
+			<if test="id != null and id != ''">
+				And a.parentid = #{id}
+			</if>
+			<!-- 数据范围过滤 -->
+			${sqlMap.dsf}
+		</where>
+		ORDER BY a.serialno 
+		<include refid="common.mysql_page" />
+	</select>
+	<select id="findCount" resultType="int">
+		SELECT 
+			count(a.id)
+		FROM location a
+		<include refid="locationJoins"/>
+		<where>	
+			<!-- <if test="branchId != '' and branchId != null">
+				AND a.branchid = #{branchId}
+			</if> -->
+			<if test="id != null and id != ''">
+				And a.parentid = #{id}
+			</if>
+			<!-- 数据范围过滤 -->
+			${sqlMap.dsf}
+		</where>
+		ORDER BY a.serialno 
+	</select>
+	
+	<select id="findAllList" resultType="Location">
+		SELECT 
+			<include refid="locationColumns"/>
+		FROM location a
+		<include refid="locationJoins"/>
+		where a.id = '0' 
+		<!-- <if test="branchId != '' and branchId != null">
+			OR a.branchid = #{branchId}
+		</if> -->
+		<!-- 数据范围过滤 -->
+		${sqlMap.dsf}
+		ORDER BY a.serialno 
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO location(
+			id,
+			branchid,
+			locationname,
+			parentid,
+			rfid,
+			locationpath,
+			locationtype,
+			serialno,
+			serialnopath,
+			filetype
+		) VALUES (
+			#{id},
+			#{branchId},
+			#{locationName},
+			#{parent.id},
+			#{rfid},
+			#{locationPath},
+			#{locationType},
+			#{serialNo},
+			#{serialNoPath},
+			#{fileType}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE location SET 	
+			branchid = #{branchId},
+			locationname = #{locationName},
+			parentid = #{parent.id},
+			rfid = #{rfid},
+			locationpath = #{locationPath},
+			locationtype = #{locationType},
+			serialno = #{serialNo},
+			serialnopath = #{serialNoPath},
+			filetype = #{fileType}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM location
+		WHERE id = #{id}
+	</update>
+	
+	<select id="getSerialNoByLocation" resultType="int">
+		SELECT 
+			case when max(a.serialNo) is null then 0 else max(a.serialNo) end 
+		FROM location a where a.parentId = #{parent.id}
+		<if test="branchId != '' and branchId != null">
+			AND a.branchid = #{branchId}
+		</if>
+	</select>
+	
+	<select id="getPArcCountByLocaton" resultType="long">
+		select count(archive.id) from archive archive,
+		vol_archive_relate relation where archive.id=relation.archiveid 
+		and relation.locationGuid = #{id} and archive.status != 'destory' 
+	</select>
+	
+	<select id="getPWarCountByLocaton" resultType="long">
+		select count(id) from warrant where locationGuid = #{id} and status != 'extraction'
+	</select>
+	
+	<select id="getEArcCountByLocaton" resultType="long">
+		select count(archive.id) from archive_c archive,customer_box_relate_c box,
+		vol_archive_relate_c relation where box.locationGuid = #{id} and archive.status != 'destory' 
+		and box.id=relation.boxGuid and relation.archiveGuid=archive.id  
+	</select>
+	
+	<select id="getEWarCountByLocaton" resultType="long">
+		select count(warrant.id) from warrant_c warrant,envelope_c envelope,
+		customer_box_relate_c box where warrant.envelopeId=envelope.id and envelope.boxGuid=box.id 
+		and box.locationGuid = #{id} and warrant.status != 'extraction' 
+	</select>
+	
+	<select id="findChildDataList" resultType="Location">
+		SELECT 
+			<include refid="locationColumns"/>
+		FROM location a
+		<include refid="locationJoins"/>
+		where a.parentid = #{id}
+		<!-- <if test="branchId != '' and branchId != null">
+			AND a.branchid = #{branchId}
+		</if> -->
+		<!-- 数据范围过滤 -->
+		${sqlMap.dsf}
+		ORDER BY a.serialno 
+	</select>
+	
+	<!-- 根据id更新位置rfid -->
+	<update id="updateLocationRfidById">
+		UPDATE location SET 	
+			rfid = #{rfid}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gtzn.modules.home.dao.PlatInformationDao">
+    <resultMap id="BaseResultMap" type="com.gtzn.modules.home.entity.PlatInformation">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="title" property="title" jdbcType="VARCHAR"/>
+        <result column="url" property="url" jdbcType="VARCHAR"/>
+        <result column="time" property="time" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, title, url, time, DATE_FORMAT(releaseDate, '%Y-%m-%d')releaseDate
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from plat_information
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        DELETE FROM plat_information
+        WHERE id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.gtzn.modules.home.entity.PlatInformation">
+        INSERT INTO plat_information (id, title, url,
+                                      time)
+        VALUES (#{id,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR},
+                #{time,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.gtzn.modules.home.entity.PlatInformation">
+        insert into plat_information
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="title != null">
+                title,
+            </if>
+            <if test="url != null">
+                url,
+            </if>
+            <if test="time != null">
+                time,
+            </if>
+            <if test="releaseDate != null">
+                releaseDate,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="title != null">
+                #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="url != null">
+                #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="time != null">
+                #{time,jdbcType=VARCHAR},
+            </if>
+            <if test="releaseDate != null">
+                #{releaseDate,jdbcType=VARCHAR},
+            </if>
+            <if test="content != null">
+                #{content,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.gtzn.modules.home.entity.PlatInformation">
+        update plat_information
+        <set>
+            <if test="title != null">
+                title = #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="url != null">
+                url = #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="time != null">
+                time = #{time,jdbcType=VARCHAR},
+            </if>
+
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updatePlat" parameterType="com.gtzn.modules.home.entity.PlatInformation">
+        update plat_information
+        <set>
+            <if test="title != null">
+                title = #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="url != null">
+                url = #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="time != null">
+                time = #{time,jdbcType=VARCHAR},
+            </if>
+            <if test="content != null">
+                content = #{content,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.gtzn.modules.home.entity.PlatInformation">
+        UPDATE plat_information
+        SET title = #{title,jdbcType=VARCHAR},
+            url   = #{url,jdbcType=VARCHAR},
+            time  = #{time,jdbcType=VARCHAR}
+        WHERE id = #{id,jdbcType=INTEGER}
+    </update>
+    <select id="queryPlatInformation" parameterType="String" resultType="java.lang.Integer">
+        select count(1) from plat_information a
+        <where>
+            a.title=#{title,jdbcType=VARCHAR}
+        </where>
+    </select>
+    <select id="queryPlatInFrom" parameterType="String" resultType="com.gtzn.modules.home.entity.PlatInformation">
+        select id, title, url, time,DATE_FORMAT(releaseDate, '%Y-%m-%d %k:%i')releaseDate,content from plat_information
+        <where>
+            id=#{id}
+        </where>
+    </select>
+    <select id="queryPlatInformationList" parameterType="String"
+            resultType="com.gtzn.modules.home.entity.PlatInformation">
+        SELECT
+            d.title,
+            d.url,
+            d.time,
+            d.id,
+            DATE_FORMAT(d.releaseDate, '%Y-%m-%d') releaseDate,
+            d.tname
+        FROM
+            (
+                SELECT
+                    a.title,
+                    a.url,
+                    a.time,
+                    a.id,
+                    releaseDate,
+                    'wbs' AS tname
+                FROM
+                    plat_information a
+                WHERE
+                    NOT EXISTS(
+                            SELECT b.typeId
+                            FROM
+                                plat_color b
+                            WHERE
+                                a.id = b.typeId
+                    )
+                UNION ALL
+                (
+                    SELECT
+                        a.title,
+                        a.url,
+                        a.time,
+                        a.id,
+                        releaseDate,
+                        'bs' AS tname
+                    FROM
+                        plat_information a,
+                        plat_color b
+                    WHERE
+                        a.id = b.typeId
+                )
+            ) d
+        ORDER BY
+            d.time DESC
+        LIMIT 6
+    </select>
+    <select id="findPage" resultType="com.gtzn.modules.home.entity.PlatInformation">
+        SELECT
+        d.title,d.url,d.time,d.id,DATE_FORMAT(d.releaseDate, '%Y-%m-%d')releaseDate,d.tname
+        FROM
+        (
+        SELECT
+        a.title,
+        a.url,
+        a.time,
+        a.id,
+        releaseDate,
+        'wbs' AS tname
+        FROM
+        plat_information a
+        WHERE
+        NOT EXISTS(
+        SELECT
+        b.typeId
+        FROM
+        plat_color b
+        WHERE
+        a.id = b.typeId
+        )
+        UNION ALL
+        (
+        SELECT
+        a.title,
+        a.url,
+        a.time,
+        a.id,
+        releaseDate,
+        'bs' AS tname
+        FROM
+        plat_information a,
+        plat_color b
+        WHERE
+        a.id = b.typeId
+        )
+        )d
+
+        <where>
+
+            <if test="title != null and title != ''">
+                AND d.title LIKE
+                <if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+            </if>
+            <if test="stime != null and stime != ''">
+                and date_format(d.releaseDate,'%Y-%m-%d') &gt;= date_format(#{stime},'%Y-%m-%d')
+            </if>
+            <if test="etime != null and etime != ''">
+                and date_format(d.releaseDate,'%Y-%m-%d') &lt;= date_format(#{etime},'%Y-%m-%d')
+
+            </if>
+        </where>
+        ORDER BY
+        d.time DESC
+        <include refid="common.mysql_page"/>
+    </select>
+    <select id="findCount" resultType="int">
+        SELECT
+        count(a.id)
+        FROM plat_information a
+        <where>
+
+            <if test="title != null and title != ''">
+                AND a.title LIKE
+                <if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+            </if>
+            <if test="stime != null and stime != ''">
+                and date_format(a.releaseDate,'%Y-%m-%d') &gt;= date_format(#{stime},'%Y-%m-%d')
+            </if>
+            <if test="etime != null and etime != ''">
+                and date_format(a.releaseDate,'%Y-%m-%d') &lt;= date_format(#{etime},'%Y-%m-%d')
+
+            </if>
+        </where>
+        ORDER BY a.time DESC
+    </select>
+    <select id="loadData" parameterType="java.util.Map"
+            resultType="com.gtzn.modules.home.entity.PlatInformation">
+        select * from(select
+        a.title,a.url,a.time,a.id,DATE_FORMAT(a.releaseDate, '%Y-%m-%d')releaseDate,content,'(行业资讯)' as tname
+        FROM
+        plat_information a
+        <where>
+            <if test="m.titleCont != null and m.titleCont != ''">
+                and (a.title like
+                concat('%',#{m.titleCont},'%')
+                or a.content like
+                concat('%',#{m.titleCont},'%')
+                )
+            </if>
+        </where>
+        order by a.time desc) row_ limit #{m.start}, #{m.rows}
+    </select>
+    <select id="loaCount" resultType="int" parameterType="java.util.Map">
+        SELECT
+        count(a.id)
+        FROM plat_information a
+        <where>
+            <if test="m.titleCont != null and m.titleCont != ''">
+                and (a.title like
+                concat('%',#{m.titleCont},'%')
+                or a.content like
+                concat('%',#{m.titleCont},'%')
+                )
+            </if>
+        </where>
+    </select>
+
+    <!-- 公告检索sql -->
+    <sql id="gg">
+        SELECT
+        info.id,
+        info.title,
+        info.content,
+        info.date AS releaseDate,
+        '(公告信息)' AS tname,
+        '1' AS type
+        FROM
+        plat_notice_info info
+        WHERE
+        <if test="m.titleCont != null and m.titleCont != ''">
+            info.title like concat('%',#{m.titleCont},'%')
+            or info.content like concat('%',#{m.titleCont},'%')
+        </if>
+    </sql>
+
+    <!-- 行业检索sql -->
+    <sql id="hy">
+        SELECT
+        mat.id,
+        mat.title,
+        mat.content,
+        mat.releaseDate,
+        '(行业资讯)' AS tname,
+        '2' AS type
+        FROM
+        plat_information mat
+        WHERE
+        <if test="m.titleCont != null and m.titleCont != ''">
+            mat.title like concat('%',#{m.titleCont},'%')
+            or mat.content like concat('%',#{m.titleCont},'%')
+        </if>
+    </sql>
+
+    <!-- 知识库检索sql -->
+    <sql id="zsk">
+        SELECT
+        t1.id,
+        t1.title,
+        t1.content,
+        t1.createTime AS releaseDate,
+        '(知识库)' AS tname,
+        '3' AS type
+        FROM
+        plat_repository_file t1
+        <where>
+            <if test="m.titleCont != null and m.titleCont != ''">
+                t1.title like concat('%',#{m.titleCont},'%')
+                or t1.keyWords like concat('%',#{m.titleCont},'%')
+                or t1.content like concat('%',#{m.titleCont},'%')
+            </if>
+        </where>
+    </sql>
+
+    <!-- 行业&公告&知识库检索 -->
+    <select id="whole" parameterType="java.util.Map" resultType="com.gtzn.modules.home.entity.PlatInformation">
+        SELECT
+        row_.id,
+        row_.title,
+        row_.content,
+        row_.releaseDate,
+        row_.tname,
+        row_.type
+        FROM (
+        <choose>
+            <when test='m.type != null and m.type == "0"'>
+                <include refid="hy"/>
+            </when>
+            <when test='m.type != null and m.type == "1"'>
+                <include refid="gg"/>
+            </when>
+            <when test='m.type != null and m.type == "2"'>
+                <include refid="zsk"/>
+            </when>
+            <when test='m.type != null and m.type == "3"'>
+                <include refid="hy"/>
+                UNION All
+                <include refid="gg"/>
+            </when>
+            <when test='m.type != null and m.type == "4"'>
+                <include refid="hy"/>
+                UNION ALL
+                <include refid="zsk"/>
+            </when>
+            <when test='m.type != null and m.type == "5"'>
+                <include refid="gg"/>
+                UNION ALL
+                <include refid="zsk"/>
+            </when>
+            <otherwise>
+                <include refid="hy"/>
+                UNION All
+                <include refid="gg"/>
+                UNION ALL
+                <include refid="zsk"/>
+            </otherwise>
+        </choose>
+        ) row_ ORDER BY row_.releaseDate limit #{m.start}, #{m.rows}
+    </select>
+
+    <!-- 行业&公告&知识库检索的总记录数 -->
+    <select id="wholeCount" resultType="int" parameterType="java.util.Map">
+        SELECT COUNT(1) FROM (
+        <choose>
+            <when test='m.type != null and m.type == "0"'>
+                <include refid="hy"/>
+            </when>
+            <when test='m.type != null and m.type == "1"'>
+                <include refid="gg"/>
+            </when>
+            <when test='m.type != null and m.type == "2"'>
+                <include refid="zsk"/>
+            </when>
+            <when test='m.type != null and m.type == "3"'>
+                <include refid="hy"/>
+                UNION All
+                <include refid="gg"/>
+            </when>
+            <when test='m.type != null and m.type == "4"'>
+                <include refid="hy"/>
+                UNION ALL
+                <include refid="zsk"/>
+            </when>
+            <when test='m.type != null and m.type == "5"'>
+                <include refid="gg"/>
+                UNION ALL
+                <include refid="zsk"/>
+            </when>
+            <otherwise>
+                <include refid="hy"/>
+                UNION All
+                <include refid="gg"/>
+                UNION ALL
+                <include refid="zsk"/>
+            </otherwise>
+        </choose>
+        ) row_
+    </select>
+
+    <delete id="deletePlatInformation" parameterType="java.lang.String">
+        DELETE FROM plat_information
+        WHERE id = #{id,jdbcType=INTEGER}
+    </delete>
+    <select id="wholeId" parameterType="String" resultType="com.gtzn.modules.home.entity.PlatInformation">
+        select a.id,a.title,a.content,a.releaseDate from
+        ((SELECT info.id,info.title,info.content,info.date as releaseDate from plat_notice_info info)
+        UNION ALL(select mat.id,mat.title,mat.content,mat.releaseDate from plat_information mat))a
+
+
+        <where>
+            id=#{id}
+            ORDER BY a.releaseDate desc
+        </where>
+    </select>
+</mapper>

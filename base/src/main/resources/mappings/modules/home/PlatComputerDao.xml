@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.home.dao.PlatComputerDao">
+    
+	<sql id="platComputerColumns">
+		a.id AS "id",
+		a.ip AS "ip",
+		a.name AS "name",
+		a.password AS "password",
+		a.bmcname AS "bmcname",
+		a.bmcpw AS "bmcpw",
+		a.ostype AS "ostype",
+		a.osversion AS "osversion",
+		a.descripe AS "descripe",
+		a.onlineflag AS "onlineflag",
+		a.conflag AS "conflag",
+		a.createdate AS "createdate",
+		a.updatedate AS "updatedate",
+		a.flag AS "flag",
+		a.ext1 AS "ext1",
+		a.ext2 AS "ext2",
+		a.ext3 AS "ext3"
+	</sql>
+	
+	<sql id="platComputerJoins">
+	</sql>
+    
+	<select id="get" resultType="PlatComputer">
+		SELECT 
+			<include refid="platComputerColumns"/>
+		FROM plat_computer a
+		<include refid="platComputerJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findPage" resultType="PlatComputer">
+		SELECT 
+			<include refid="platComputerColumns"/>
+		FROM plat_computer a
+		<include refid="platComputerJoins"/>
+		<where>
+			
+			<if test="ip != null and ip != ''">
+				AND a.ip  LIKE concat('%',#{ip},'%')
+			</if>
+			<if test="ostype != null and ostype != ''">
+				AND a.ostype = #{ostype}
+			</if>
+			
+		</where>
+		ORDER BY a.updatedate DESC
+			<include refid="common.mysql_page" />
+	</select>
+	<select id="findCount" resultType="int">
+		SELECT 
+			count(a.id)
+		FROM plat_computer a
+		<include refid="platComputerJoins"/>
+		<where>
+			
+			<if test="ip != null and ip != ''">
+				AND a.ip = #{ip}
+			</if>
+		</where>
+		ORDER BY a.updatedate DESC
+	</select>
+	
+	<select id="findAllList" resultType="PlatComputer">
+		SELECT 
+			<include refid="platComputerColumns"/>
+		FROM plat_computer a
+		<include refid="platComputerJoins"/>
+		<where>
+			
+			<if test="ip != null and ip != ''">
+				AND a.ip = #{ip}
+			</if>
+		</where>		
+	</select>
+
+	<insert id="insert">
+		INSERT INTO plat_computer
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			  id,
+			  ip,
+			  name,
+			  password,
+			  bmcname,
+			  bmcpw,
+			  ostype,
+			  osversion,
+			  descripe,
+			  onlineflag,
+			  conflag,
+			  createdate,
+			  updatedate,
+			  flag,
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			  #{id,jdbcType=VARCHAR},
+			  #{ip,jdbcType=VARCHAR},
+			  #{name,jdbcType=VARCHAR},
+			  #{password,jdbcType=VARCHAR},
+			  #{bmcname,jdbcType=VARCHAR},
+			  #{bmcpw,jdbcType=VARCHAR},
+			  #{ostype,jdbcType=CHAR},
+			  #{osversion,jdbcType=CHAR},
+			  #{descripe,jdbcType=VARCHAR},
+			  #{onlineflag,jdbcType=CHAR},
+			  #{conflag,jdbcType=CHAR},
+			  #{createdate,jdbcType=TIMESTAMP},
+			  #{updatedate,jdbcType=TIMESTAMP},
+			  #{flag,jdbcType=CHAR},
+		</trim>
+	</insert>
+	
+	<insert id="insertSelective">
+		INSERT INTO plat_computer
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+			  id,
+			</if>
+			<if test="ip != null and ip != ''">
+			  ip,
+			</if>
+			<if test="name != null and name != ''">
+			  name,
+			</if>
+			<if test="password != null and password != ''">
+			  password,
+			</if>
+			<if test="bmcname != null and bmcname != ''">
+			  bmcname,
+			</if>
+			<if test="bmcpw != null and bmcpw != ''">
+			  bmcpw,
+			</if>
+			<if test="ostype != null and ostype != ''">
+			  ostype,
+			</if>
+			<if test="osversion != null and osversion != ''">
+			  osversion,
+			</if>
+			<if test="descripe != null and descripe != ''">
+			  descripe,
+			</if>
+			<if test="onlineflag != null and onlineflag != ''">
+			  onlineflag,
+			</if>
+			<if test="conflag != null and conflag != ''">
+			  conflag,
+			</if>
+			<if test="createdate != null and createdate != ''">
+			  createdate,
+			</if>
+			<if test="updatedate != null and updatedate != ''">
+			  updatedate,
+			</if>
+			<if test="flag != null and flag != ''">
+			  flag,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+			  #{id,jdbcType=VARCHAR},
+			</if>
+			<if test="ip != null and ip != ''">
+			  #{ip,jdbcType=VARCHAR},
+			</if>
+			<if test="name != null and name != ''">
+			  #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="password != null and password != ''">
+			  #{password,jdbcType=VARCHAR},
+			</if>
+			<if test="bmcname != null and bmcname != ''">
+			  #{bmcname,jdbcType=VARCHAR},
+			</if>
+			<if test="bmcpw != null and bmcpw != ''">
+			  #{bmcpw,jdbcType=VARCHAR},
+			</if>
+			<if test="ostype != null and ostype != ''">
+			  #{ostype,jdbcType=CHAR},
+			</if>
+			<if test="osversion != null and osversion != ''">
+			  #{osversion,jdbcType=CHAR},
+			</if>
+			<if test="descripe != null and descripe != ''">
+			  #{descripe,jdbcType=VARCHAR},
+			</if>
+			<if test="onlineflag != null and onlineflag != ''">
+			  #{onlineflag,jdbcType=CHAR},
+			</if>
+			<if test="conflag != null and conflag != ''">
+			  #{conflag,jdbcType=CHAR},
+			</if>
+			<if test="createdate != null and createdate != ''">
+			  #{createdate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updatedate != null and updatedate != ''">
+			  #{updatedate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="flag != null and flag != ''">
+			  #{flag,jdbcType=CHAR},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="update" parameterType="PlatComputer">
+		UPDATE plat_computer
+		 	<set>
+				ip = #{ip,jdbcType=VARCHAR},
+				name = #{name,jdbcType=VARCHAR},
+				password = #{password,jdbcType=VARCHAR},
+				bmcname = #{bmcname,jdbcType=VARCHAR},
+				bmcpw = #{bmcpw,jdbcType=VARCHAR},
+				ostype = #{ostype,jdbcType=CHAR},
+				osversion = #{osversion,jdbcType=CHAR},
+				descripe = #{descripe,jdbcType=VARCHAR},
+				onlineflag = #{onlineflag,jdbcType=CHAR},
+				conflag = #{conflag,jdbcType=CHAR},
+				createdate = #{createdate,jdbcType=TIMESTAMP},
+				updatedate = #{updatedate,jdbcType=TIMESTAMP},
+				flag = #{flag,jdbcType=CHAR},
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateSelective" parameterType="PlatComputer">
+		UPDATE plat_computer
+		 	<set>
+				<if test="ip != null and ip != ''">
+				  ip = #{ip,jdbcType=VARCHAR},
+				</if>
+				<if test="name != null and name != ''">
+				  name = #{name,jdbcType=VARCHAR},
+				</if>
+				<if test="password != null and password != ''">
+				  password = #{password,jdbcType=VARCHAR},
+				</if>
+				<if test="bmcname != null and bmcname != ''">
+				  bmcname = #{bmcname,jdbcType=VARCHAR},
+				</if>
+				<if test="bmcpw != null and bmcpw != ''">
+				  bmcpw = #{bmcpw,jdbcType=VARCHAR},
+				</if>
+				<if test="ostype != null and ostype != ''">
+				  ostype = #{ostype,jdbcType=CHAR},
+				</if>
+				<if test="osversion != null and osversion != ''">
+				  osversion = #{osversion,jdbcType=CHAR},
+				</if>
+				<if test="descripe != null and descripe != ''">
+				  descripe = #{descripe,jdbcType=VARCHAR},
+				</if>
+				<if test="onlineflag != null and onlineflag != ''">
+				  onlineflag = #{onlineflag,jdbcType=CHAR},
+				</if>
+				<if test="conflag != null and conflag != ''">
+				  conflag = #{conflag,jdbcType=CHAR},
+				</if>
+				<if test="createdate != null and createdate != ''">
+				  createdate = #{createdate,jdbcType=TIMESTAMP},
+				</if>
+				<if test="updatedate != null and updatedate != ''">
+				  updatedate = #{updatedate,jdbcType=TIMESTAMP},
+				</if>
+				<if test="flag != null and flag != ''">
+				  flag = #{flag,jdbcType=CHAR},
+				</if>
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM plat_computer
+		WHERE id = #{id}
+	</update>
+
+	<update id="batchDelete">
+		DELETE FROM plat_computer
+		WHERE id in
+		<if test="idList != null" >
+			<foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+			   #{item}
+			</foreach>
+   		 </if>
+	</update>
+
+	<insert id="batchInsert">
+			INSERT INTO plat_computer
+			<trim prefix="(" suffix=")" suffixOverrides="," >
+					id,
+					ip,
+					name,
+					password,
+					bmcname,
+					bmcpw,
+					ostype,
+					osversion,
+					descripe,
+					onlineflag,
+					conflag,
+					createdate,
+					updatedate,
+					flag,
+			</trim>
+			VALUES
+			<foreach collection="list" item="item" index="index" separator="," >
+				<trim prefix="(" suffix=")" suffixOverrides="," >
+							#{item.id},
+							#{item.ip},
+							#{item.name},
+							#{item.password},
+							#{item.bmcname},
+							#{item.bmcpw},
+							#{item.ostype},
+							#{item.osversion},
+							#{item.descripe},
+							#{item.onlineflag},
+							#{item.conflag},
+							#{item.createdate},
+							#{item.updatedate},
+							#{item.flag},
+				</trim>
+			</foreach>
+	</insert>
+
+	<update id="executeUpdate" parameterType="java.lang.String">
+		#{sql}
+	</update>
+
+</mapper>

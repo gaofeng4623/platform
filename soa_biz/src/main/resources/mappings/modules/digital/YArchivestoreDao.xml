@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.digital.dao.YArchivestoreDao">
+    <!-- 档案库一个表的信息 -->
+    <sql id="yArchivestoreSingleColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.tblname AS "tblname",
+		a.template_id AS "templateId",
+		a.class_id AS "classId",
+		a.pid AS "pid",
+		a.typecode AS "typecode",
+		a.typename AS "typename",
+		a.datype AS "datype",
+		a.ixh AS "ixh",
+		a.cindex AS "cindex",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+    
+	<sql id="yArchivestoreColumns">
+		x.id AS "id",
+		x.name AS "name",
+		x.tblname AS "tblname",
+		x.template_id AS "templateId",
+		x.class_id AS "classId",
+		x.pid AS "pid",
+		x.typecode AS "typecode",
+		x.typename AS "typename",
+		x.datype AS "datype",
+		x.ixh AS "ixh",
+		x.cindex AS "cindex",
+		x.create_by AS "createBy.id",
+		x.create_date AS "createDate",
+		x.update_by AS "updateBy.id",
+		x.update_date AS "updateDate",
+		x.remarks AS "remarks",
+		x.del_flag AS "delFlag",
+		y.temname AS "templateName"
+	</sql>
+	
+	<sql id="ystoreInfoCols">
+		a.id AS "id",
+		a.name AS "name",
+		a.tblname AS "tblname",
+		a.template_id AS "templateId",
+		a.class_id AS "classId",
+		a.datype AS "datype",
+		a.ixh AS "ixh",
+		a.cindex AS "cindex",
+		a.remarks AS "remarks",
+		b.temname AS 'templateName',c.name AS 'archiveclassName'
+	</sql>
+	
+	<sql id="yArchivestoreJoins">
+		LEFT JOIN y_template y ON y.id = x.template_id
+	</sql>
+    
+    <select id="findAllListByType" resultType="YArchivestore">
+    	select 
+    	a.id AS "id",
+		a.name AS "name",
+		a.tblname AS "tblname",
+		a.template_id AS "templateId",
+		a.class_id AS "classId",
+		a.datype AS "datype",
+		a.ixh AS "ixh",
+		a.cindex AS "cindex",
+		a.remarks AS "remarks" 
+		FROM y_archivestore a 
+		where datype in (
+		<foreach collection="storeTypes" item="v" open="" close="" separator=",">
+		#{v}	
+		</foreach>
+		) and del_flag = 0
+    </select>
+    
+    <select id="getById" resultType="YArchivestore" parameterType="java.lang.String">
+		SELECT
+			<include refid="yArchivestoreSingleColumns"/>
+		FROM y_archivestore a
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="getByTableName" resultType="YArchivestore" parameterType="java.lang.String">
+		SELECT
+		<include refid="yArchivestoreSingleColumns"/>
+		FROM y_archivestore a
+		WHERE a.tblname = #{tbName}
+	</select>
+
+	<select id="getColumnByTableName" resultType="java.lang.String" parameterType="java.lang.Object">
+		SELECT
+			  b.fieldname
+		FROM  y_archivestore a,
+			  y_templatefield b
+		WHERE
+			  a.template_id = b.template_id
+			  AND
+			  a.tblname = #{tbName}
+			  AND
+			  b.fieldpro = #{clName}
+	</select>
+
+	<select id="get" resultType="YArchivestore">
+		SELECT 
+			<include refid="ystoreInfoCols"/>
+		FROM y_archivestore a,y_template b,y_archiveclass c
+		WHERE a.id = #{id} AND a.template_id=b.id AND a.class_id=c.id 
+	</select>
+	
+
+	<select id="findAllList" resultType="YArchivestore">
+		SELECT 
+			<include refid="yArchivestoreColumns"/>
+		FROM y_archivestore x
+		<include refid="yArchivestoreJoins"/>
+		<where>
+			x.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND x.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="templateId != null and templateId != ''">
+				AND x.template_id = #{templateId}
+			</if>
+			<if test="classId != null and classId != ''">
+				AND x.class_id = #{classId}
+			</if>
+			<if test="pid != null and pid != ''">
+				AND x.pid = #{pid}
+			</if>
+			<if test="delFlag != null and delFlag != ''">
+				AND x.del_flag = #{delFlag}
+			</if>
+			<if test="datype != null and datype != ''">
+				AND x.datype = #{datype}
+			</if>
+			<if test="cindex != null and cindex != ''">
+				AND x.cindex = #{cindex}
+			</if>
+		</where>
+		ORDER BY x.ixh		
+	</select>
+
+	<select id="getStoreByIds" resultType="YArchivestore">
+		SELECT 
+			<include refid="yArchivestoreSingleColumns"/>
+		FROM y_archivestore a
+		<where>
+			a.del_flag = 0  
+			and a.id in
+		     <foreach item="item" index="index"  collection="storelist" open="(" separator="," close=")">  
+		      #{item}  
+		     </foreach> 
+		</where>
+		<!-- ORDER BY a.update_date DESC -->
+	</select>
+</mapper>

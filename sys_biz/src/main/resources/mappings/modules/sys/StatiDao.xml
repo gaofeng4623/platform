@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.sys.dao.StatiDao">
+    <!-- <cache type="org.mybatis.caches.redis.RedisCache" /> -->
+	<select id="findList" resultType="Stati" databaseId="mysql">
+		select
+		  id,
+		  statiKey,
+		  statiName,
+		  icon,
+		  unit,
+		  groupFlag,
+		  color
+		from sys_stati
+		order by id asc
+	</select>	
+	
+	<select id="findGroup" resultType="Stati" databaseId="mysql">
+		select
+		 distinct groupFlag
+		from sys_stati
+		order by id asc
+	</select>	
+	
+	<select id="findStatiIds" resultType="String" databaseId="mysql">
+		select statiIds
+		from sys_role_statis
+		where roleId = #{roleId}
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.home.dao.PlatCollectionDao">
+    
+	<sql id="platCollectionColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.theme AS "theme",
+		a.title AS "title",
+		a.content AS "content",
+		a.sourcefrom AS "sourcefrom",
+		a.author AS "author",
+		a.collector AS "collector",
+		a.autordate AS "autordate",
+		a.collectdate AS "collectdate",
+		a.efile AS "efile",
+		a.ext1 AS "ext1",
+		a.ext2 AS "ext2",
+		a.ext3 AS "ext3"
+	</sql>
+	
+	<sql id="platCollectionJoins">
+	</sql>
+    
+	<select id="get" resultType="PlatCollection">
+		SELECT 
+			<include refid="platCollectionColumns"/>
+		FROM plat_collection a
+		<include refid="platCollectionJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findTopN" resultType="PlatCollection">
+		SELECT 
+			<include refid="platCollectionColumns"/>
+		FROM plat_collection a ORDER BY a.collectdate DESC limit #{topN}
+	</select>
+	
+	<select id="findPage" resultType="PlatCollection">
+		SELECT 
+			<include refid="platCollectionColumns"/>
+		FROM plat_collection a
+		<include refid="platCollectionJoins"/>
+		<where>
+			
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+		</where>
+		ORDER BY a.collectdate DESC
+			<include refid="common.mysql_page" />
+	</select>
+	<select id="findCount" resultType="int">
+		SELECT 
+			count(a.id)
+		FROM plat_collection a
+		<include refid="platCollectionJoins"/>
+		<where>
+			
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+		</where>
+		ORDER BY a.collectdate DESC
+	</select>
+	
+	<select id="findAllList" resultType="PlatCollection">
+		SELECT 
+			<include refid="platCollectionColumns"/>
+		FROM plat_collection a
+		<include refid="platCollectionJoins"/>
+		<where>
+			
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+		</where>		
+	</select>
+
+	<insert id="insert">
+		INSERT INTO plat_collection
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			  id,
+			  type,
+			  theme,
+			  title,
+			  content,
+			  sourcefrom,
+			  author,
+			  collector,
+			  autordate,
+			  collectdate,
+			  efile,
+			  ext1,
+			  ext2,
+			  ext3,
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			  #{id,jdbcType=VARCHAR},
+			  #{type,jdbcType=VARCHAR},
+			  #{theme,jdbcType=VARCHAR},
+			  #{title,jdbcType=VARCHAR},
+			  #{content,jdbcType=VARCHAR},
+			  #{sourcefrom,jdbcType=VARCHAR},
+			  #{author,jdbcType=VARCHAR},
+			  #{collector,jdbcType=VARCHAR},
+			  #{autordate,jdbcType=TIMESTAMP},
+			  #{collectdate,jdbcType=TIMESTAMP},
+			  #{efile,jdbcType=VARCHAR},
+			  #{ext1,jdbcType=VARCHAR},
+			  #{ext2,jdbcType=VARCHAR},
+			  #{ext3,jdbcType=VARCHAR},
+		</trim>
+	</insert>
+	
+	<insert id="insertSelective">
+		INSERT INTO plat_collection
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+			  id,
+			</if>
+			<if test="type != null and type != ''">
+			  type,
+			</if>
+			<if test="theme != null and theme != ''">
+			  theme,
+			</if>
+			<if test="title != null and title != ''">
+			  title,
+			</if>
+			<if test="content != null and content != ''">
+			  content,
+			</if>
+			<if test="sourcefrom != null and sourcefrom != ''">
+			  sourcefrom,
+			</if>
+			<if test="author != null and author != ''">
+			  author,
+			</if>
+			<if test="collector != null and collector != ''">
+			  collector,
+			</if>
+			<if test="autordate != null and autordate != ''">
+			  autordate,
+			</if>
+			<if test="collectdate != null and collectdate != ''">
+			  collectdate,
+			</if>
+			<if test="efile != null and efile != ''">
+			  efile,
+			</if>
+			<if test="ext1 != null and ext1 != ''">
+			  ext1,
+			</if>
+			<if test="ext2 != null and ext2 != ''">
+			  ext2,
+			</if>
+			<if test="ext3 != null and ext3 != ''">
+			  ext3,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+			  #{id,jdbcType=VARCHAR},
+			</if>
+			<if test="type != null and type != ''">
+			  #{type,jdbcType=VARCHAR},
+			</if>
+			<if test="theme != null and theme != ''">
+			  #{theme,jdbcType=VARCHAR},
+			</if>
+			<if test="title != null and title != ''">
+			  #{title,jdbcType=VARCHAR},
+			</if>
+			<if test="content != null and content != ''">
+			  #{content,jdbcType=VARCHAR},
+			</if>
+			<if test="sourcefrom != null and sourcefrom != ''">
+			  #{sourcefrom,jdbcType=VARCHAR},
+			</if>
+			<if test="author != null and author != ''">
+			  #{author,jdbcType=VARCHAR},
+			</if>
+			<if test="collector != null and collector != ''">
+			  #{collector,jdbcType=VARCHAR},
+			</if>
+			<if test="autordate != null and autordate != ''">
+			  #{autordate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="collectdate != null and collectdate != ''">
+			  #{collectdate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="efile != null and efile != ''">
+			  #{efile,jdbcType=VARCHAR},
+			</if>
+			<if test="ext1 != null and ext1 != ''">
+			  #{ext1,jdbcType=VARCHAR},
+			</if>
+			<if test="ext2 != null and ext2 != ''">
+			  #{ext2,jdbcType=VARCHAR},
+			</if>
+			<if test="ext3 != null and ext3 != ''">
+			  #{ext3,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="update" parameterType="PlatCollection">
+		UPDATE plat_collection
+		 	<set>
+				type = #{type,jdbcType=VARCHAR},
+				theme = #{theme,jdbcType=VARCHAR},
+				title = #{title,jdbcType=VARCHAR},
+				content = #{content,jdbcType=VARCHAR},
+				sourcefrom = #{sourcefrom,jdbcType=VARCHAR},
+				author = #{author,jdbcType=VARCHAR},
+				collector = #{collector,jdbcType=VARCHAR},
+				autordate = #{autordate,jdbcType=TIMESTAMP},
+				collectdate = #{collectdate,jdbcType=TIMESTAMP},
+				efile = #{efile,jdbcType=VARCHAR},
+				ext1 = #{ext1,jdbcType=VARCHAR},
+				ext2 = #{ext2,jdbcType=VARCHAR},
+				ext3 = #{ext3,jdbcType=VARCHAR},
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateSelective" parameterType="PlatCollection">
+		UPDATE plat_collection
+		 	<set>
+				<if test="type != null and type != ''">
+				  type = #{type,jdbcType=VARCHAR},
+				</if>
+				<if test="theme != null and theme != ''">
+				  theme = #{theme,jdbcType=VARCHAR},
+				</if>
+				<if test="title != null and title != ''">
+				  title = #{title,jdbcType=VARCHAR},
+				</if>
+				<if test="content != null and content != ''">
+				  content = #{content,jdbcType=VARCHAR},
+				</if>
+				<if test="sourcefrom != null and sourcefrom != ''">
+				  sourcefrom = #{sourcefrom,jdbcType=VARCHAR},
+				</if>
+				<if test="author != null and author != ''">
+				  author = #{author,jdbcType=VARCHAR},
+				</if>
+				<if test="collector != null and collector != ''">
+				  collector = #{collector,jdbcType=VARCHAR},
+				</if>
+				<if test="autordate != null and autordate != ''">
+				  autordate = #{autordate,jdbcType=TIMESTAMP},
+				</if>
+				<if test="collectdate != null and collectdate != ''">
+				  collectdate = #{collectdate,jdbcType=TIMESTAMP},
+				</if>
+				<if test="efile != null and efile != ''">
+				  efile = #{efile,jdbcType=VARCHAR},
+				</if>
+				<if test="ext1 != null and ext1 != ''">
+				  ext1 = #{ext1,jdbcType=VARCHAR},
+				</if>
+				<if test="ext2 != null and ext2 != ''">
+				  ext2 = #{ext2,jdbcType=VARCHAR},
+				</if>
+				<if test="ext3 != null and ext3 != ''">
+				  ext3 = #{ext3,jdbcType=VARCHAR},
+				</if>
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM plat_collection
+		WHERE id = #{id}
+	</update>
+
+	<update id="batchDelete">
+		DELETE FROM plat_collection
+		WHERE id in
+		<if test="idList != null" >
+			<foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+			   #{item}
+			</foreach>
+   		 </if>
+	</update>
+
+	<insert id="batchInsert">
+			INSERT INTO plat_collection
+			<trim prefix="(" suffix=")" suffixOverrides="," >
+					id,
+					type,
+					theme,
+					title,
+					content,
+					sourcefrom,
+					author,
+					collector,
+					autordate,
+					collectdate,
+					efile,
+					ext1,
+					ext2,
+					ext3,
+			</trim>
+			VALUES
+			<foreach collection="list" item="item" index="index" separator="," >
+				<trim prefix="(" suffix=")" suffixOverrides="," >
+							#{item.id},
+							#{item.type},
+							#{item.theme},
+							#{item.title},
+							#{item.content},
+							#{item.sourcefrom},
+							#{item.author},
+							#{item.collector},
+							#{item.autordate},
+							#{item.collectdate},
+							#{item.efile},
+							#{item.ext1},
+							#{item.ext2},
+							#{item.ext3},
+				</trim>
+			</foreach>
+	</insert>
+
+	<update id="executeUpdate" parameterType="java.lang.String">
+		#{sql}
+	</update>
+
+</mapper>

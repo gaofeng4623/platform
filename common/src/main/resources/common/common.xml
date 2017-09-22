@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="common">
+	<sql id="mysql_page">
+		<if test="pager != null and pager.page != null and pager.rows != null">
+			<![CDATA[ 	 limit ${pager.start} , ${pager.rows} ]]>
+		</if>
+	</sql>
+	
+	<sql id="oracle_page_start">
+		<![CDATA[ 	
+			select *
+	  			from (select table_.*, ROWNUM as rowno
+	          		from ( 
+		]]>
+	</sql>
+	
+	<sql id="oracle_page_end">
+		<![CDATA[  
+				) table_
+		         where ROWNUM <= ${pager.end}  ) table_alias
+		 	where table_alias.rowno >=  ${(pager.start}
+		 ]]>
+	</sql>
+</mapper>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.workflow.dao.FormDesignDao">
+    <!-- <cache type="org.mybatis.caches.redis.RedisCache" /> -->
+	<select id="getForm" resultType="Form" databaseId="mysql">
+		select
+		  id,
+		  name,
+		  fields
+		from act_ext_form
+		where id = #{id}
+	</select>
+	<select id="findForm" resultType="Form" databaseId="mysql">
+		select
+		  id,
+		  name,
+		  fields
+		from act_ext_form
+	</select>
+	<update id="updateForm" databaseId="mysql">
+		update act_ext_form
+		set 
+		  	name = #{name},
+		  	remark = #{remark}
+		where id = #{id};
+	</update>
+	<update id="updateFormFields" databaseId="mysql">
+		update act_ext_form
+		set 
+		  	fields = #{fields}
+		where id = #{id};
+	</update>
+	<insert id="insertForm" databaseId="mysql">
+		insert into act_ext_form
+            (id, name, fields)
+		values (#{id}, #{name}, #{fields});
+	</insert>
+	<insert id="insertFormGroup" databaseId="mysql">
+		insert into act_ext_form_group
+            (form_id, group_id, cid, option)
+		values 
+			(#{form_id},#{group_id},#{cid},#{option});
+	</insert>
+	<insert id="insertFormModel" databaseId="mysql">
+		insert into act_ext_form_model
+            (form_id, model_id)
+		values (#{form_id}, #{model_id});
+	</insert>
+	<insert id="insertFormRuValue" databaseId="mysql">
+		insert into gtzn_deploy.act_ext_form_ru_value
+            (form_id, proc_inst_id, cid, value)
+		values (#{form_id}, #{proc_inst_id},#{cid}, #{value});
+	</insert>
+	
+</mapper>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.digital.dao.AttachmentDao">
+
+    <!-- 根据条件获取子文件夹列表 -->
+    <select id="findList" resultType="Attachment">
+        SELECT
+            id,
+            groupId,
+            fileName,
+            filePath,
+            fileSize,
+            creater AS 'user.id',
+            createTime
+        FROM
+            plat_attachment
+        WHERE
+            groupId = #{groupId};
+    </select>
+
+    <!-- 新增一个文件夹 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="Attachment">
+        INSERT INTO plat_attachment (
+            groupId,
+            fileName,
+            filePath,
+            fileSize,
+            creater,
+            createTime
+        )
+        VALUES
+            (#{groupId}, #{fileName}, #{filePath}, #{fileSize}, #{user.id}, #{createDate});
+    </insert>
+
+    <!-- 删除一个文件夹 -->
+    <delete id="delete">
+        DELETE FROM plat_attachment
+        <where>
+            <if test="id != null and id != ''">
+                id = #{id}
+            </if>
+            <if test="groupId != null and groupId != ''">
+                AND groupId = #{groupId}
+            </if>
+        </where>
+    </delete>
+
+    <!-- 根据文件夹id获取该文件夹下的附件 -->
+    <select id="getAttachmentByFolderId" resultType="Attachment">
+        SELECT
+            t2.filePath
+        FROM
+            plat_repository_file t1,
+            plat_attachment t2
+        WHERE
+            t1.folderId = #{folderId}
+            AND t1.attGroupId = t2.groupId
+    </select>
+</mapper>

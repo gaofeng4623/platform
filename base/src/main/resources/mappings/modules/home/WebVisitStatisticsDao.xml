@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.home.dao.WebVisitStatisticsDao">
+    
+	<sql id="webVisitStatisticsColumns">
+		a.id AS "id",
+		a.visittype AS "visittype",
+		a.visittemplate AS "visittemplate",
+		a.visittime AS "visittime",
+		a.visitcount AS "visitcount"
+	</sql>
+	
+	<sql id="webVisitStatisticsJoins">
+	</sql>
+	
+    <!-- 获取模型名称 -->
+    <select id="getTemp" resultType="WebVisitStatistics">
+    	SELECT distinct a.visittemplate FROM web_visit_statistics a 
+    	WHERE a.visittemplate != 'N'
+    </select>
+    
+    <!-- 获取前三年年份 -->
+    <select id="getYear" resultType="int">
+    	SELECT t.y FROM
+    		(SELECT distinct YEAR(a.visittime) AS y 
+    		FROM web_visit_statistics a ORDER BY y DESC LIMIT 0,3) t
+    	ORDER BY t.y
+    </select>
+    
+    <!-- 年模块浏览量 -->
+    <select id="getTempYesrCount" resultType="Integer">
+    	SELECT SUM(a.visitcount) FROM web_visit_statistics a 
+    	WHERE 
+    	a.visittemplate = #{template}
+    	AND 
+    	YEAR(a.visittime) = #{year}
+    </select>
+    
+    <!-- 获取最近十二月份 -->
+    <select id="getYearMonth" resultType="String">
+    	SELECT t.ym FROM
+			(SELECT DISTINCT DATE_FORMAT(a.visittime,'%Y-%m') ym 
+				FROM web_visit_statistics a ORDER BY ym DESC LIMIT 0,12) t
+		ORDER BY t.ym
+    </select>
+    
+    <!-- 该月的统计量 -->
+    <select id="getMonthCount" resultType="Integer">
+    	SELECT SUM(a.visitcount) FROM web_visit_statistics a 
+    	WHERE 
+    	a.visittemplate='N' 
+    	AND 
+    	a.visittype=#{type} 
+    	AND 
+    	DATE_FORMAT(a.visittime,'%Y-%m')=#{yearMonth}
+    </select>
+    
+    <!-- 获取最近30天 -->
+    <select id="getMonthDay" resultType="String">
+    	SELECT t.ym FROM
+    		(SELECT DISTINCT DATE_FORMAT(a.visittime,'%Y-%m-%d') ym 
+    			FROM web_visit_statistics a ORDER BY ym DESC LIMIT 0,30) t
+    	ORDER BY t.ym
+    </select>
+    
+    <!-- 该日的统计量 -->
+    <select id="getDayCount" resultType="Integer">
+    	SELECT SUM(a.visitcount) FROM web_visit_statistics a 
+    	WHERE 
+    	a.visittemplate='N' 
+    	AND 
+    	a.visittype=#{type} 
+    	AND 
+    	DATE_FORMAT(a.visittime,'%Y-%m-%d')=#{monthDay}
+    </select>
+    
+    <!-- 根据日期查类型 -->
+    <select id="getDayVisittype" resultType="String">
+    	SELECT DISTINCT a.visittype FROM web_visit_statistics a 
+    	WHERE DATE_FORMAT(a.visittime,'%Y-%m-%d')=#{monthDay}
+    </select>
+    
+    
+    
+	<select id="get" resultType="WebVisitStatistics">
+		SELECT 
+			<include refid="webVisitStatisticsColumns"/>
+		FROM web_visit_statistics a
+		<include refid="webVisitStatisticsJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findPage" resultType="WebVisitStatistics">
+		SELECT 
+			<include refid="webVisitStatisticsColumns"/>
+		FROM web_visit_statistics a
+		<include refid="webVisitStatisticsJoins"/>
+		<where>
+			
+		</where>
+		ORDER BY a.update_date DESC
+			<include refid="common.mysql_page" />
+	</select>
+	<select id="findCount" resultType="int">
+		SELECT 
+			count(a.id)
+		FROM web_visit_statistics a
+		<include refid="webVisitStatisticsJoins"/>
+		<where>
+			
+		</where>
+		ORDER BY a.update_date DESC
+	</select>
+	
+	<select id="findAllList" resultType="WebVisitStatistics">
+		SELECT 
+			<include refid="webVisitStatisticsColumns"/>
+		FROM web_visit_statistics a
+		<include refid="webVisitStatisticsJoins"/>
+		<where>
+			
+		</where>		
+	</select>
+
+	<insert id="insert">
+		INSERT INTO web_visit_statistics
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			  id,
+			  visittype,
+			  visittemplate,
+			  visittime,
+			  visitcount,
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			  #{id,jdbcType=VARCHAR},
+			  #{visittype,jdbcType=VARCHAR},
+			  #{visittemplate,jdbcType=VARCHAR},
+			  #{visittime,jdbcType=TIMESTAMP},
+			  #{visitcount,jdbcType=INTEGER},
+		</trim>
+	</insert>
+	
+	<insert id="insertSelective">
+		INSERT INTO web_visit_statistics
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+			  id,
+			</if>
+			<if test="visittype != null and visittype != ''">
+			  visittype,
+			</if>
+			<if test="visittemplate != null and visittemplate != ''">
+			  visittemplate,
+			</if>
+			<if test="visittime != null and visittime != ''">
+			  visittime,
+			</if>
+			<if test="visitcount != null and visitcount != ''">
+			  visitcount,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+			  #{id,jdbcType=VARCHAR},
+			</if>
+			<if test="visittype != null and visittype != ''">
+			  #{visittype,jdbcType=VARCHAR},
+			</if>
+			<if test="visittemplate != null and visittemplate != ''">
+			  #{visittemplate,jdbcType=VARCHAR},
+			</if>
+			<if test="visittime != null and visittime != ''">
+			  #{visittime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="visitcount != null and visitcount != ''">
+			  #{visitcount,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="update" parameterType="WebVisitStatistics">
+		UPDATE web_visit_statistics
+		 	<set>
+				visittype = #{visittype,jdbcType=VARCHAR},
+				visittemplate = #{visittemplate,jdbcType=VARCHAR},
+				visittime = #{visittime,jdbcType=TIMESTAMP},
+				visitcount = #{visitcount,jdbcType=INTEGER},
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateSelective" parameterType="WebVisitStatistics">
+		UPDATE web_visit_statistics
+		 	<set>
+				<if test="visittype != null and visittype != ''">
+				  visittype = #{visittype,jdbcType=VARCHAR},
+				</if>
+				<if test="visittemplate != null and visittemplate != ''">
+				  visittemplate = #{visittemplate,jdbcType=VARCHAR},
+				</if>
+				<if test="visittime != null and visittime != ''">
+				  visittime = #{visittime,jdbcType=TIMESTAMP},
+				</if>
+				<if test="visitcount != null and visitcount != ''">
+				  visitcount = #{visitcount,jdbcType=INTEGER},
+				</if>
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM web_visit_statistics
+		WHERE id = #{id}
+	</update>
+
+	<update id="batchDelete">
+		DELETE FROM web_visit_statistics
+		WHERE id in
+		<if test="idList != null" >
+			<foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+			   #{item}
+			</foreach>
+   		 </if>
+	</update>
+
+	<insert id="batchInsert">
+			INSERT INTO web_visit_statistics
+			<trim prefix="(" suffix=")" suffixOverrides="," >
+					id,
+					visittype,
+					visittemplate,
+					visittime,
+					visitcount,
+			</trim>
+			VALUES
+			<foreach collection="list" item="item" index="index" separator="," >
+				<trim prefix="(" suffix=")" suffixOverrides="," >
+							#{item.id},
+							#{item.visittype},
+							#{item.visittemplate},
+							#{item.visittime},
+							#{item.visitcount},
+				</trim>
+			</foreach>
+	</insert>
+
+	<update id="executeUpdate" parameterType="java.lang.String">
+		#{sql}
+	</update>
+
+</mapper>

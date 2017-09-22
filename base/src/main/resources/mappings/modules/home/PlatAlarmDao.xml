@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.home.dao.PlatAlarmDao">
+    
+	<sql id="platAlarmColumns">
+		a.id AS "id",
+		a.create_time AS "createTime",
+		a.alarm_deviceid AS "alarmDeviceid",
+		a.alarm_devicename AS "alarmDevicename",
+		a.alarm_type AS "alarmType",
+		a.alarm_room AS "alarmRoom",
+		a.link_action AS "linkAction",
+		a.status AS "status",
+		a.isdeal AS "isdeal",
+		a.deal_time AS "dealTime",
+		a.alarm_grades AS "alarmGrades",
+		a.content AS "content"
+	</sql>
+	
+	<sql id="platAlarmJoins">
+	</sql>
+    
+	<select id="get" resultType="PlatAlarm">
+		SELECT 
+			<include refid="platAlarmColumns"/>
+		FROM plat_alarm a
+		<include refid="platAlarmJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findPage" resultType="PlatAlarm">
+		SELECT 
+			<include refid="platAlarmColumns"/>
+		FROM plat_alarm a
+		<include refid="platAlarmJoins"/>
+		<where>
+			<if test="alarmDevicename != null and alarmDevicename != ''">
+				AND a.alarm_devicename LIKE
+					<if test="dbName == 'oracle'">'%'||#{alarmDevicename}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{alarmDevicename}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{alarmDevicename},'%')</if>
+					
+			</if> 
+			<if test="startDate != null and startDate != ''">
+				AND a.create_time &gt;= #{startDate}   
+			</if> 
+			<if test="endDate != null and endDate != ''">
+ 				AND a.create_time &lt; date_add(#{endDate}, INTERVAL 1 day)   
+					
+			</if>
+		</where>
+		ORDER BY a.create_time DESC
+			<include refid="common.mysql_page" />
+	</select>
+	<select id="findCount" resultType="int">
+		SELECT 
+			count(a.id)
+		FROM plat_alarm a
+		<include refid="platAlarmJoins"/>
+		<where>
+			
+		</where>
+		ORDER BY a.create_time DESC
+	</select>
+	
+	<select id="findAllList" resultType="PlatAlarm">
+		SELECT 
+			<include refid="platAlarmColumns"/>
+		FROM plat_alarm a
+		<include refid="platAlarmJoins"/>
+		<where>
+			
+		</where>		
+	</select>
+
+	<insert id="insert">
+		INSERT INTO plat_alarm
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			  id,
+			  create_time,
+			  alarm_deviceid,
+			  alarm_devicename,
+			  alarm_type,
+			  alarm_room,
+			  link_action,
+			  status,
+			  isdeal,
+			  deal_time,
+			  alarm_grades,
+			  content,
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			  #{id,jdbcType=VARCHAR},
+			  #{createTime,jdbcType=TIMESTAMP},
+			  #{alarmDeviceid,jdbcType=VARCHAR},
+			  #{alarmDevicename,jdbcType=VARCHAR},
+			  #{alarmType,jdbcType=VARCHAR},
+			  #{alarmRoom,jdbcType=VARCHAR},
+			  #{linkAction,jdbcType=VARCHAR},
+			  #{status,jdbcType=VARCHAR},
+			  #{isdeal,jdbcType=CHAR},
+			  #{dealTime,jdbcType=TIMESTAMP},
+			  #{alarmGrades,jdbcType=VARCHAR},
+			  #{content,jdbcType=VARCHAR},
+		</trim>
+	</insert>
+	
+	<insert id="insertSelective">
+		INSERT INTO plat_alarm
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+			  id,
+			</if>
+			<if test="createTime != null and createTime != ''">
+			  create_time,
+			</if>
+			<if test="alarmDeviceid != null and alarmDeviceid != ''">
+			  alarm_deviceid,
+			</if>
+			<if test="alarmDevicename != null and alarmDevicename != ''">
+			  alarm_devicename,
+			</if>
+			<if test="alarmType != null and alarmType != ''">
+			  alarm_type,
+			</if>
+			<if test="alarmRoom != null and alarmRoom != ''">
+			  alarm_room,
+			</if>
+			<if test="linkAction != null and linkAction != ''">
+			  link_action,
+			</if>
+			<if test="status != null and status != ''">
+			  status,
+			</if>
+			<if test="isdeal != null and isdeal != ''">
+			  isdeal,
+			</if>
+			<if test="dealTime != null and dealTime != ''">
+			  deal_time,
+			</if>
+			<if test="alarmGrades != null and alarmGrades != ''">
+			  alarm_grades,
+			</if>
+			<if test="content != null and content != ''">
+			  content,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+			  #{id,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null and createTime != ''">
+			  #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="alarmDeviceid != null and alarmDeviceid != ''">
+			  #{alarmDeviceid,jdbcType=VARCHAR},
+			</if>
+			<if test="alarmDevicename != null and alarmDevicename != ''">
+			  #{alarmDevicename,jdbcType=VARCHAR},
+			</if>
+			<if test="alarmType != null and alarmType != ''">
+			  #{alarmType,jdbcType=VARCHAR},
+			</if>
+			<if test="alarmRoom != null and alarmRoom != ''">
+			  #{alarmRoom,jdbcType=VARCHAR},
+			</if>
+			<if test="linkAction != null and linkAction != ''">
+			  #{linkAction,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null and status != ''">
+			  #{status,jdbcType=VARCHAR},
+			</if>
+			<if test="isdeal != null and isdeal != ''">
+			  #{isdeal,jdbcType=CHAR},
+			</if>
+			<if test="dealTime != null and dealTime != ''">
+			  #{dealTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="alarmGrades != null and alarmGrades != ''">
+			  #{alarmGrades,jdbcType=VARCHAR},
+			</if>
+			<if test="content != null and content != ''">
+			  #{content,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="update" parameterType="PlatAlarm">
+		UPDATE plat_alarm
+		 	<set>
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+				alarm_deviceid = #{alarmDeviceid,jdbcType=VARCHAR},
+				alarm_devicename = #{alarmDevicename,jdbcType=VARCHAR},
+				alarm_type = #{alarmType,jdbcType=VARCHAR},
+				alarm_room = #{alarmRoom,jdbcType=VARCHAR},
+				link_action = #{linkAction,jdbcType=VARCHAR},
+				status = #{status,jdbcType=VARCHAR},
+				isdeal = #{isdeal,jdbcType=CHAR},
+				deal_time = #{dealTime,jdbcType=TIMESTAMP},
+				alarm_grades = #{alarmGrades,jdbcType=VARCHAR},
+				content = #{content,jdbcType=VARCHAR},
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateSelective" parameterType="PlatAlarm">
+		UPDATE plat_alarm
+		 	<set>
+				<if test="createTime != null and createTime != ''">
+				  create_time = #{createTime,jdbcType=TIMESTAMP},
+				</if>
+				<if test="alarmDeviceid != null and alarmDeviceid != ''">
+				  alarm_deviceid = #{alarmDeviceid,jdbcType=VARCHAR},
+				</if>
+				<if test="alarmDevicename != null and alarmDevicename != ''">
+				  alarm_devicename = #{alarmDevicename,jdbcType=VARCHAR},
+				</if>
+				<if test="alarmType != null and alarmType != ''">
+				  alarm_type = #{alarmType,jdbcType=VARCHAR},
+				</if>
+				<if test="alarmRoom != null and alarmRoom != ''">
+				  alarm_room = #{alarmRoom,jdbcType=VARCHAR},
+				</if>
+				<if test="linkAction != null and linkAction != ''">
+				  link_action = #{linkAction,jdbcType=VARCHAR},
+				</if>
+				<if test="status != null and status != ''">
+				  status = #{status,jdbcType=VARCHAR},
+				</if>
+				<if test="isdeal != null and isdeal != ''">
+				  isdeal = #{isdeal,jdbcType=CHAR},
+				</if>
+				<if test="dealTime != null and dealTime != ''">
+				  deal_time = #{dealTime,jdbcType=TIMESTAMP},
+				</if>
+				<if test="alarmGrades != null and alarmGrades != ''">
+				  alarm_grades = #{alarmGrades,jdbcType=VARCHAR},
+				</if>
+				<if test="content != null and content != ''">
+				  alarm_grades = #{content,jdbcType=VARCHAR},
+				</if>
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM plat_alarm
+		WHERE id = #{id}
+	</update>
+
+	<update id="batchDelete">
+		DELETE FROM plat_alarm
+		WHERE id in
+		<if test="idList != null" >
+			<foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+			   #{item}
+			</foreach>
+   		 </if>
+	</update>
+
+	<insert id="batchInsert">
+			INSERT INTO plat_alarm
+			<trim prefix="(" suffix=")" suffixOverrides="," >
+					id,
+					create_time,
+					alarm_deviceid,
+					alarm_devicename,
+					alarm_type,
+					alarm_room,
+					link_action,
+					status,
+					isdeal,
+					deal_time,
+					alarm_grades,
+					content,
+			</trim>
+			VALUES
+			<foreach collection="list" item="item" index="index" separator="," >
+				<trim prefix="(" suffix=")" suffixOverrides="," >
+							#{item.id},
+							#{item.create_time},
+							#{item.alarm_deviceid},
+							#{item.alarm_devicename},
+							#{item.alarm_type},
+							#{item.alarm_room},
+							#{item.link_action},
+							#{item.status},
+							#{item.isdeal},
+							#{item.deal_time},
+							#{item.alarm_grades},
+							#{item.content},
+				</trim>
+			</foreach>
+	</insert>
+
+	<update id="executeUpdate" parameterType="java.lang.String">
+		#{sql}
+	</update>
+
+</mapper>

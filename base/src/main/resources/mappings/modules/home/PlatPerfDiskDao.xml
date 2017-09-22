@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.home.dao.PlatPerfDiskDao">
+    
+	<sql id="platPerfDiskColumns">
+		a.id AS "id",
+		a.ip AS "ip",
+		a.total AS "total",
+		a.free AS "free",
+		a.percent AS "percent",
+		a.name AS "name",
+		a.collectdate AS "collectdate"
+	</sql>
+	
+	<sql id="platPerfDiskJoins">
+	</sql>
+    
+	<select id="get" resultType="PlatPerfDisk">
+		SELECT 
+			<include refid="platPerfDiskColumns"/>
+		FROM plat_perf_disk a
+		<include refid="platPerfDiskJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findPage" resultType="PlatPerfDisk">
+		SELECT 
+			<include refid="platPerfDiskColumns"/>
+		FROM plat_perf_disk a
+		<include refid="platPerfDiskJoins"/>
+		<where>
+			
+			<if test="ip != null and ip != ''">
+				AND a.ip = #{ip}
+			</if>
+			<if test="beginCollectdate != null and endCollectdate != null and beginCollectdate != '' and endCollectdate != ''">
+				AND a.collectdate BETWEEN #{beginCollectdate} AND #{endCollectdate}
+			</if>
+		</where>
+		ORDER BY a.update_date DESC
+			<include refid="common.mysql_page" />
+	</select>
+	<select id="findCount" resultType="int">
+		SELECT 
+			count(a.id)
+		FROM plat_perf_disk a
+		<include refid="platPerfDiskJoins"/>
+		<where>
+			
+			<if test="ip != null and ip != ''">
+				AND a.ip = #{ip}
+			</if>
+			<if test="beginCollectdate != null and endCollectdate != null and beginCollectdate != '' and endCollectdate != ''">
+				AND a.collectdate BETWEEN #{beginCollectdate} AND #{endCollectdate}
+			</if>
+		</where>
+		ORDER BY a.update_date DESC
+	</select>
+	
+	<select id="findAllList" resultType="PlatPerfDisk">
+		SELECT 
+			<include refid="platPerfDiskColumns"/>
+		FROM plat_perf_disk a
+		<include refid="platPerfDiskJoins"/>
+		<where>
+			
+			<if test="ip != null and ip != ''">
+				AND a.ip = #{ip}
+			</if>
+			<if test="beginCollectdate != null and endCollectdate != null and beginCollectdate != '' and endCollectdate != ''">
+				AND a.collectdate BETWEEN #{beginCollectdate} AND #{endCollectdate}
+			</if>
+		</where>		
+	</select>
+	
+	<select id="findAllDayList" resultType="PlatPerfDisk">
+		SELECT 
+			<include refid="platPerfDiskColumns"/>
+		FROM plat_perf_disk_day a
+		<include refid="platPerfDiskJoins"/>
+		<where>
+			
+			<if test="ip != null and ip != ''">
+				AND a.ip = #{ip}
+			</if>
+			<if test="beginCollectdate != null and endCollectdate != null and beginCollectdate != '' and endCollectdate != ''">
+				AND a.collectdate BETWEEN #{beginCollectdate} AND #{endCollectdate}
+			</if>
+		</where>
+		ORDER BY a.collectdate DESC			
+	</select>
+	<select id="findAllMonthList" resultType="PlatPerfDisk">
+		SELECT 
+			<include refid="platPerfDiskColumns"/>
+		FROM plat_perf_disk_month a
+		<include refid="platPerfDiskJoins"/>
+		<where>
+			
+			<if test="ip != null and ip != ''">
+				AND a.ip = #{ip}
+			</if>
+			<if test="beginCollectdate != null and endCollectdate != null and beginCollectdate != '' and endCollectdate != ''">
+				AND a.collectdate BETWEEN #{beginCollectdate} AND #{endCollectdate}
+			</if>
+		</where>
+		ORDER BY a.collectdate DESC			
+	</select>
+	<select id="findAllYearList" resultType="PlatPerfDisk">
+		SELECT 
+			<include refid="platPerfDiskColumns"/>
+		FROM plat_perf_disk_year a
+		<include refid="platPerfDiskJoins"/>
+		<where>
+			
+			<if test="ip != null and ip != ''">
+				AND a.ip = #{ip}
+			</if>
+			<if test="beginCollectdate != null and endCollectdate != null and beginCollectdate != '' and endCollectdate != ''">
+				AND a.collectdate BETWEEN #{beginCollectdate} AND #{endCollectdate}
+			</if>
+		</where>
+		ORDER BY a.collectdate DESC			
+	</select>
+	
+
+	<insert id="insert">
+		INSERT INTO plat_perf_disk
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			  id,
+			  ip,
+			  total,
+			  free,
+			  percent,
+			  name,
+			  collectdate,
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			  #{id,jdbcType=VARCHAR},
+			  #{ip,jdbcType=VARCHAR},
+			  #{total,jdbcType=INTEGER},
+			  #{free,jdbcType=INTEGER},
+			  #{percent,jdbcType=FLOAT},
+			  #{name,jdbcType=VARCHAR},
+			  #{collectdate,jdbcType=TIMESTAMP},
+		</trim>
+	</insert>
+	
+	<insert id="insertSelective">
+		INSERT INTO plat_perf_disk
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+			  id,
+			</if>
+			<if test="ip != null and ip != ''">
+			  ip,
+			</if>
+			<if test="total != null and total != ''">
+			  total,
+			</if>
+			<if test="free != null and free != ''">
+			  free,
+			</if>
+			<if test="percent != null and percent != ''">
+			  percent,
+			</if>
+			<if test="name != null and name != ''">
+			  name,
+			</if>
+			<if test="collectdate != null and collectdate != ''">
+			  collectdate,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+			  #{id,jdbcType=VARCHAR},
+			</if>
+			<if test="ip != null and ip != ''">
+			  #{ip,jdbcType=VARCHAR},
+			</if>
+			<if test="total != null and total != ''">
+			  #{total,jdbcType=INTEGER},
+			</if>
+			<if test="free != null and free != ''">
+			  #{free,jdbcType=INTEGER},
+			</if>
+			<if test="percent != null and percent != ''">
+			  #{percent,jdbcType=FLOAT},
+			</if>
+			<if test="name != null and name != ''">
+			  #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="collectdate != null and collectdate != ''">
+			  #{collectdate,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="update" parameterType="PlatPerfDisk">
+		UPDATE plat_perf_disk
+		 	<set>
+				ip = #{ip,jdbcType=VARCHAR},
+				total = #{total,jdbcType=INTEGER},
+				free = #{free,jdbcType=INTEGER},
+				percent = #{percent,jdbcType=FLOAT},
+				name = #{name,jdbcType=VARCHAR},
+				collectdate = #{collectdate,jdbcType=TIMESTAMP},
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateSelective" parameterType="PlatPerfDisk">
+		UPDATE plat_perf_disk
+		 	<set>
+				<if test="ip != null and ip != ''">
+				  ip = #{ip,jdbcType=VARCHAR},
+				</if>
+				<if test="total != null and total != ''">
+				  total = #{total,jdbcType=INTEGER},
+				</if>
+				<if test="free != null and free != ''">
+				  free = #{free,jdbcType=INTEGER},
+				</if>
+				<if test="percent != null and percent != ''">
+				  percent = #{percent,jdbcType=FLOAT},
+				</if>
+				<if test="name != null and name != ''">
+				  name = #{name,jdbcType=VARCHAR},
+				</if>
+				<if test="collectdate != null and collectdate != ''">
+				  collectdate = #{collectdate,jdbcType=TIMESTAMP},
+				</if>
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM plat_perf_disk
+		WHERE id = #{id}
+	</update>
+
+	<update id="batchDelete">
+		DELETE FROM plat_perf_disk
+		WHERE id in
+		<if test="idList != null" >
+			<foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+			   #{item}
+			</foreach>
+   		 </if>
+	</update>
+
+	<insert id="batchInsert">
+			INSERT INTO plat_perf_disk
+			<trim prefix="(" suffix=")" suffixOverrides="," >
+					id,
+					ip,
+					total,
+					free,
+					percent,
+					name,
+					collectdate,
+			</trim>
+			VALUES
+			<foreach collection="list" item="item" index="index" separator="," >
+				<trim prefix="(" suffix=")" suffixOverrides="," >
+							#{item.id},
+							#{item.ip},
+							#{item.total},
+							#{item.free},
+							#{item.percent},
+							#{item.name},
+							#{item.collectdate},
+				</trim>
+			</foreach>
+	</insert>
+
+	<update id="executeUpdate" parameterType="java.lang.String">
+		#{sql}
+	</update>
+
+</mapper>

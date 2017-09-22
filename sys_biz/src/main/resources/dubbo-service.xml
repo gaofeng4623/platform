@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans          
+        http://www.springframework.org/schema/beans/spring-beans.xsd          
+        http://code.alibabatech.com/schema/dubbo          
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+
+	<!-- 和本地bean一样实现服务  声明需要暴露的服务接口 
+	<bean id="logService" class="com.gtzn.modules.sys.service.LogServiceImpl" />-->
+	<dubbo:service ref="dictService" interface="com.gtzn.modules.sys.service.DictService" />
+	<dubbo:service ref="logService" interface="com.gtzn.modules.sys.service.LogService" />
+	<dubbo:service ref="officeService" interface="com.gtzn.modules.sys.service.OfficeService" />
+	<dubbo:service ref="systemService" interface="com.gtzn.modules.sys.service.SystemService" />
+	<dubbo:service ref="exampleService" interface="com.gtzn.modules.sys.service.ExampleService" />
+
+	<dubbo:service ref="genSchemeService" interface="com.gtzn.modules.gen.service.GenSchemeService" />
+	<dubbo:service ref="genTableService" interface="com.gtzn.modules.gen.service.GenTableService" />
+	<dubbo:service ref="genTemplateService" interface="com.gtzn.modules.gen.service.GenTemplateService" />
+</beans>  

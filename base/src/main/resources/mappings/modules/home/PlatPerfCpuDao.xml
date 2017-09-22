@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.home.dao.PlatPerfCpuDao">
+    
+	<sql id="platPerfCpuColumns">
+		a.id AS "id",
+		a.ip AS "ip",
+		a.percent AS "percent",
+		a.name AS "name",
+		a.collecttime AS "collecttime",
+		a.ext1 AS "ext1",
+		a.ext2 AS "ext2",
+		a.ext3 AS "ext3"
+	</sql>
+	
+	<sql id="platPerfCpuJoins">
+	</sql>
+    
+	<select id="get" resultType="PlatPerfCpu">
+		SELECT 
+			<include refid="platPerfCpuColumns"/>
+		FROM plat_perf_cpu a
+		<include refid="platPerfCpuJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findPage" resultType="PlatPerfCpu">
+		SELECT 
+			<include refid="platPerfCpuColumns"/>
+		FROM plat_perf_cpu a
+		<include refid="platPerfCpuJoins"/>
+		<where>
+			
+			<if test="ip != null and ip != ''">
+				AND a.ip = #{ip}
+			</if>
+			<if test="beginCollecttime != null and endCollecttime != null and beginCollecttime != '' and endCollecttime != ''">
+				AND a.collecttime BETWEEN #{beginCollecttime} AND #{endCollecttime}
+			</if>
+		</where>
+		ORDER BY a.update_date DESC
+			<include refid="common.mysql_page" />
+	</select>
+	<select id="findCount" resultType="int">
+		SELECT 
+			count(a.id)
+		FROM plat_perf_cpu a
+		<include refid="platPerfCpuJoins"/>
+		<where>
+			
+			<if test="ip != null and ip != ''">
+				AND a.ip = #{ip}
+			</if>
+			<if test="beginCollecttime != null and endCollecttime != null and beginCollecttime != '' and endCollecttime != ''">
+				AND a.collecttime BETWEEN #{beginCollecttime} AND #{endCollecttime}
+			</if>
+		</where>
+		ORDER BY a.update_date DESC
+	</select>
+	
+	<select id="findAllList" resultType="PlatPerfCpu">
+		SELECT 
+			<include refid="platPerfCpuColumns"/>
+		FROM plat_perf_cpu a
+		<include refid="platPerfCpuJoins"/>
+		<where>
+			
+			<if test="ip != null and ip != ''">
+				AND a.ip = #{ip}
+			</if>
+			<if test="beginCollecttime != null and endCollecttime != null and beginCollecttime != '' and endCollecttime != ''">
+				AND a.collecttime BETWEEN #{beginCollecttime} AND #{endCollecttime}
+			</if>
+		</where>		
+	</select>
+	
+	<select id="findAllDayList" resultType="PlatPerfCpu">
+		SELECT 
+			<include refid="platPerfCpuColumns"/>
+		FROM plat_perf_cpu_day a
+		<include refid="platPerfCpuJoins"/>
+		<where>
+			
+			<if test="ip != null and ip != ''">
+				AND a.ip = #{ip}
+			</if>
+			<if test="beginCollecttime != null and endCollecttime != null and beginCollecttime != '' and endCollecttime != ''">
+				AND a.collecttime BETWEEN #{beginCollecttime} AND #{endCollecttime}
+			</if>
+		</where>
+		ORDER BY a.collecttime DESC		
+	</select>
+	<select id="findAllMonthList" resultType="PlatPerfCpu">
+		SELECT 
+			<include refid="platPerfCpuColumns"/>
+		FROM plat_perf_cpu_month a
+		<include refid="platPerfCpuJoins"/>
+		<where>
+			
+			<if test="ip != null and ip != ''">
+				AND a.ip = #{ip}
+			</if>
+			<if test="beginCollecttime != null and endCollecttime != null and beginCollecttime != '' and endCollecttime != ''">
+				AND a.collecttime BETWEEN #{beginCollecttime} AND #{endCollecttime}
+			</if>
+		</where>
+		ORDER BY a.collecttime DESC				
+	</select>
+		<select id="findAllYearList" resultType="PlatPerfCpu">
+		SELECT 
+			<include refid="platPerfCpuColumns"/>
+		FROM plat_perf_cpu_year a
+		<include refid="platPerfCpuJoins"/>
+		<where>
+			
+			<if test="ip != null and ip != ''">
+				AND a.ip = #{ip}
+			</if>
+			<if test="beginCollecttime != null and endCollecttime != null and beginCollecttime != '' and endCollecttime != ''">
+				AND a.collecttime BETWEEN #{beginCollecttime} AND #{endCollecttime}
+			</if>
+		</where>	
+		ORDER BY a.collecttime DESC			
+	</select>
+
+	<insert id="insert">
+		INSERT INTO plat_perf_cpu
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			  id,
+			  ip,
+			  percent,
+			  name,
+			  collecttime,
+			  ext1,
+			  ext2,
+			  ext3,
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			  #{id,jdbcType=VARCHAR},
+			  #{ip,jdbcType=VARCHAR},
+			  #{percent,jdbcType=FLOAT},
+			  #{name,jdbcType=VARCHAR},
+			  #{collecttime,jdbcType=TIMESTAMP},
+			  #{ext1,jdbcType=VARCHAR},
+			  #{ext2,jdbcType=VARCHAR},
+			  #{ext3,jdbcType=VARCHAR},
+		</trim>
+	</insert>
+	
+	<insert id="insertSelective">
+		INSERT INTO plat_perf_cpu
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+			  id,
+			</if>
+			<if test="ip != null and ip != ''">
+			  ip,
+			</if>
+			<if test="percent != null and percent != ''">
+			  percent,
+			</if>
+			<if test="name != null and name != ''">
+			  name,
+			</if>
+			<if test="collecttime != null and collecttime != ''">
+			  collecttime,
+			</if>
+			<if test="ext1 != null and ext1 != ''">
+			  ext1,
+			</if>
+			<if test="ext2 != null and ext2 != ''">
+			  ext2,
+			</if>
+			<if test="ext3 != null and ext3 != ''">
+			  ext3,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+			  #{id,jdbcType=VARCHAR},
+			</if>
+			<if test="ip != null and ip != ''">
+			  #{ip,jdbcType=VARCHAR},
+			</if>
+			<if test="percent != null and percent != ''">
+			  #{percent,jdbcType=FLOAT},
+			</if>
+			<if test="name != null and name != ''">
+			  #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="collecttime != null and collecttime != ''">
+			  #{collecttime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="ext1 != null and ext1 != ''">
+			  #{ext1,jdbcType=VARCHAR},
+			</if>
+			<if test="ext2 != null and ext2 != ''">
+			  #{ext2,jdbcType=VARCHAR},
+			</if>
+			<if test="ext3 != null and ext3 != ''">
+			  #{ext3,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="update" parameterType="PlatPerfCpu">
+		UPDATE plat_perf_cpu
+		 	<set>
+				ip = #{ip,jdbcType=VARCHAR},
+				percent = #{percent,jdbcType=FLOAT},
+				name = #{name,jdbcType=VARCHAR},
+				collecttime = #{collecttime,jdbcType=TIMESTAMP},
+				ext1 = #{ext1,jdbcType=VARCHAR},
+				ext2 = #{ext2,jdbcType=VARCHAR},
+				ext3 = #{ext3,jdbcType=VARCHAR},
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateSelective" parameterType="PlatPerfCpu">
+		UPDATE plat_perf_cpu
+		 	<set>
+				<if test="ip != null and ip != ''">
+				  ip = #{ip,jdbcType=VARCHAR},
+				</if>
+				<if test="percent != null and percent != ''">
+				  percent = #{percent,jdbcType=FLOAT},
+				</if>
+				<if test="name != null and name != ''">
+				  name = #{name,jdbcType=VARCHAR},
+				</if>
+				<if test="collecttime != null and collecttime != ''">
+				  collecttime = #{collecttime,jdbcType=TIMESTAMP},
+				</if>
+				<if test="ext1 != null and ext1 != ''">
+				  ext1 = #{ext1,jdbcType=VARCHAR},
+				</if>
+				<if test="ext2 != null and ext2 != ''">
+				  ext2 = #{ext2,jdbcType=VARCHAR},
+				</if>
+				<if test="ext3 != null and ext3 != ''">
+				  ext3 = #{ext3,jdbcType=VARCHAR},
+				</if>
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM plat_perf_cpu
+		WHERE id = #{id}
+	</update>
+
+	<update id="batchDelete">
+		DELETE FROM plat_perf_cpu
+		WHERE id in
+		<if test="idList != null" >
+			<foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+			   #{item}
+			</foreach>
+   		 </if>
+	</update>
+
+	<insert id="batchInsert">
+			INSERT INTO plat_perf_cpu
+			<trim prefix="(" suffix=")" suffixOverrides="," >
+					id,
+					ip,
+					percent,
+					name,
+					collecttime,
+					ext1,
+					ext2,
+					ext3,
+			</trim>
+			VALUES
+			<foreach collection="list" item="item" index="index" separator="," >
+				<trim prefix="(" suffix=")" suffixOverrides="," >
+							#{item.id},
+							#{item.ip},
+							#{item.percent},
+							#{item.name},
+							#{item.collecttime},
+							#{item.ext1},
+							#{item.ext2},
+							#{item.ext3},
+				</trim>
+			</foreach>
+	</insert>
+
+	<update id="executeUpdate" parameterType="java.lang.String">
+		#{sql}
+	</update>
+
+</mapper>

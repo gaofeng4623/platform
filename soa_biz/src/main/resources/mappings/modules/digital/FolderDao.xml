@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.digital.dao.FolderDao">
+
+    <!-- 通过文件夹id查询文件夹信息 -->
+    <select id="get" resultType="Folder">
+        SELECT
+            id,
+            parent_id  AS parentId,
+            folderName AS name,
+            creater,
+            createTime,
+            isParent
+        FROM
+            plat_repository_folder
+        WHERE
+            id = #{id}
+    </select>
+
+    <!-- 根据文件夹id获取所有子文件夹列表 -->
+    <select id="getChildListById" resultType="Folder">
+        SELECT
+            id,
+            parent_id  AS parentId,
+            folderName AS name,
+            creater,
+            createTime,
+            isParent
+        FROM
+            plat_repository_folder
+        WHERE
+            parent_id = #{id}
+    </select>
+
+    <!-- 新增一个文件夹，返回新增的文件夹信息 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="Folder">
+        INSERT INTO plat_repository_folder (
+            parent_id,
+            folderName,
+            creater,
+            createTime
+        )
+        VALUES
+            (#{parentId}, #{name}, #{createBy.id}, #{createDate});
+    </insert>
+
+    <!-- 通过文件夹id删除一个文件夹 -->
+    <delete id="delete">
+        DELETE FROM plat_repository_folder
+        WHERE id = #{id}
+    </delete>
+
+    <!-- 通过文件夹id修改文件夹信息 -->
+    <update id="update">
+        UPDATE plat_repository_folder
+        <set>
+            <if test="parentId != null and parentId != ''">
+                parent_id = #{parentId},
+            </if>
+            <if test="name != null and name != ''">
+                folderName = #{name},
+            </if>
+            <if test="createBy != null and createBy.id != null and createBy.id != ''">
+                creater = #{createBy.id},
+            </if>
+            <if test="createDate != null and createDate != ''">
+                createTime = #{createDate},
+            </if>
+            <if test="isParent != null and isParent != ''">
+                isParent = #{isParent},
+            </if>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <!-- 根据文件夹父id获取该节点的所有兄弟节点 -->
+    <select id="getListByParentId" resultType="Folder">
+        SELECT
+            id,
+            parent_id  AS parentId,
+            folderName AS name,
+            creater,
+            createTime,
+            isParent
+        FROM
+            plat_repository_folder
+        WHERE
+            parent_id = #{parentId}
+    </select>
+</mapper>

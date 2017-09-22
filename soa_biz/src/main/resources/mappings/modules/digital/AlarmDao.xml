@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.digital.dao.AlarmDao">
+
+    <select id="getRoomInfo" resultType="java.util.HashMap">
+    	select r.fId,r.fName from t_room r
+    </select>
+    
+    <select id="getWdByRoomId" parameterType="int" resultType="java.util.HashMap">
+		<![CDATA[
+	    select t.fCreateTime,t.fTemperature from t_history_wsd t
+		where t.fRoomId = #{roomId}
+		and fCreateTime >= CAST(CAST(SYSDATE()AS DATE) AS DATETIME)
+		and fCreateTime <= CAST((CAST(SYSDATE()AS DATE) + INTERVAL 1 DAY - INTERVAL 1 SECOND) AS DATETIME)
+		order by t.fCreateTime 
+		]]>
+    </select>
+    
+    <select id="getSdByRoomId" parameterType="int" resultType="java.util.HashMap">
+		<![CDATA[
+	    select t.fCreateTime,t.fHumidity from t_history_wsd t
+		where t.fRoomId = #{roomId}
+		and fCreateTime >= CAST(CAST(SYSDATE()AS DATE) AS DATETIME)
+		and fCreateTime <= CAST((CAST(SYSDATE()AS DATE) + INTERVAL 1 DAY - INTERVAL 1 SECOND) AS DATETIME)
+		order by t.fCreateTime
+		]]>
+    </select>
+    
+    <select id="getDeviceIdListByRoomIdAndOperation" parameterType="java.util.Map" resultType="int">
+		<![CDATA[
+		select t.fDeviceId from t_record_operation t
+		where t.fRoomId = #{map.roomId}
+		and t.fOperationResult = 1
+		and fCreateTime >= CAST(CAST(#{map.startDate} AS DATE) AS DATETIME)
+		and fCreateTime <= CAST((CAST(#{map.startDate} AS DATE) + INTERVAL 1 DAY - INTERVAL 1 SECOND) AS DATETIME)
+		group by t.fDeviceId
+		]]>
+    </select>
+    
+    <select id="getOperationTimeByDeviceId" parameterType="java.util.Map" resultType="java.util.HashMap">
+		<![CDATA[
+		select fCreateTime,fOperation from t_record_operation t
+		where 1=1
+		and t.fDeviceId = #{map.deviceId}
+		and t.fOperationResult = 1
+		and fCreateTime >= CAST(CAST(#{map.startDate} AS DATE) AS DATETIME)
+		and fCreateTime <= CAST((CAST(#{map.startDate} AS DATE) + INTERVAL 1 DAY - INTERVAL 1 SECOND) AS DATETIME)
+		and t.fOperation like '%${map.operation}%'
+		order by fId
+		]]>
+    </select>
+    
+    <select id="getAlarmListByAlarm" resultType="com.gtzn.modules.monitor.entity.Alarm">
+		<![CDATA[
+		select t.fId as _alarmId,
+			t.fCreateTime as _createTime,
+			t.fAlarmDeviceId as _alarmDeviceId,
+			t.fAlarmDeviceName as _alarmDeviceName,
+			t.fAlarmTypeName as _alarmTypeName,
+			t.fLastAlarmTime as _lastAlarmTime,
+			t.fRoomName as _roomName,
+			t.fLinkageAction as _linkageAction,
+			t.fUserName as _userName,
+			t.fMention as _mention,
+			t.fIsDeal as _isDeal,
+			t.fDealTime as _dealTime,
+			t.fAlarmTypeId as _alarmTypeId,
+			case g.fLevel when 1 then '严重'
+					when 2 then '一般'
+					else '轻度' end as grades
+			from t_alarm t, t_alarm_type g
+		]]>
+			where 1=1
+				and t.fAlarmTypeId = g.fAlarmTypeId
+			<if test="alarmId != null and alarmId != ''">
+				and t.fId = #{alarmId}
+			</if>
+			<if test="grades != null and grades != ''">
+				and g.fLevel = #{grades}
+			</if>
+			<if test="mention != null and mention != ''">
+				and t.fMention = #{mention}
+			</if>
+			<if test="startDate != null and startDate != ''">
+				<![CDATA[ and t.fCreateTime >= CAST(CAST(#{startDate} AS DATE) AS DATETIME) ]]>
+			</if>
+			<if test="endDate != null and endDate != ''">
+				<![CDATA[ and t.fCreateTime <= CAST((CAST(#{endDate} AS DATE) + INTERVAL 1 DAY - INTERVAL 1 SECOND) AS DATETIME) ]]>
+			</if>
+		order by t.fIsDeal ASC, t.fCreateTime DESC, g.fLevel
+    </select>
+    
+    <select id="getGradesCountByNow" parameterType="int" resultType="java.util.HashMap">
+		<![CDATA[
+		select b.fLevel as fLevel, IFNULL(a.fCount, 0) as fCount
+		from 
+		(select 1 as fLevel
+		union 
+		select 2 as fLevel
+		UNION
+		select 3 as fLevel
+		) b
+		left join 
+		(select g.fLevel as fLevel, count(1) as fCount
+		from t_alarm t, t_alarm_type g
+		where 1=1
+		and t.fAlarmTypeId = g.fAlarmTypeId
+		and t.fCreateTime >= CAST(date_add(curdate()-day(curdate())+1,interval - 3 month) AS DATETIME)
+		and t.fCreateTime <= CAST(last_day(date_sub(now(),interval 3 month)) + INTERVAL 1 DAY - INTERVAL 1 SECOND AS DATETIME)
+		group by g.fLevel) a
+		on b.fLevel = a.fLevel
+		]]>
+    </select>
+    
+</mapper>

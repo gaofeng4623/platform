@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.home.dao.PlatShowroomDao">
+    
+	<sql id="platShowroomColumns">
+		a.id AS "id",
+		a.visitor AS "visitor",
+		a.plat AS "plat",
+		a.position AS "position",
+		a.collecttime AS "collecttime",
+		a.ext1 AS "ext1",
+		a.ext2 AS "ext2",
+		a.ext3 AS "ext3"
+	</sql>
+	
+	<sql id="platShowroomJoins">
+	</sql>
+    
+	<select id="get" resultType="PlatShowroom">
+		SELECT 
+			<include refid="platShowroomColumns"/>
+		FROM plat_showroom a
+		<include refid="platShowroomJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findPage" resultType="PlatShowroom">
+		SELECT 
+			<include refid="platShowroomColumns"/>
+		FROM plat_showroom a
+		<include refid="platShowroomJoins"/>
+		<where>
+			
+			<if test="plat != null and plat != ''">
+				AND a.plat = #{plat}
+			</if>
+			<if test="beginCollecttime != null and endCollecttime != null and beginCollecttime != '' and endCollecttime != ''">
+				AND a.collecttime BETWEEN #{beginCollecttime} AND #{endCollecttime}
+			</if>
+		</where>
+		ORDER BY a.update_date DESC
+			<include refid="common.mysql_page" />
+	</select>
+	<select id="findCount" resultType="int">
+		SELECT 
+			count(a.id)
+		FROM plat_showroom a
+		<include refid="platShowroomJoins"/>
+		<where>
+			
+			<if test="plat != null and plat != ''">
+				AND a.plat = #{plat}
+			</if>
+			<if test="beginCollecttime != null and endCollecttime != null and beginCollecttime != '' and endCollecttime != ''">
+				AND a.collecttime BETWEEN #{beginCollecttime} AND #{endCollecttime}
+			</if>
+		</where>
+		ORDER BY a.update_date DESC
+	</select>
+	
+	<select id="findAllList" resultType="PlatShowroom">
+		SELECT 
+			<include refid="platShowroomColumns"/>
+		FROM plat_showroom a
+		<include refid="platShowroomJoins"/>
+		<where>
+			
+			<if test="plat != null and plat != ''">
+				AND a.plat = #{plat}
+			</if>
+			<if test="beginCollecttime != null and endCollecttime != null and beginCollecttime != '' and endCollecttime != ''">
+				AND a.collecttime BETWEEN #{beginCollecttime} AND #{endCollecttime}
+			</if>
+		</where>		
+	</select>
+
+	<insert id="insert">
+		INSERT INTO plat_showroom
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			  id,
+			  visitor,
+			  plat,
+			  position,
+			  collecttime,
+			  ext1,
+			  ext2,
+			  ext3,
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			  #{id,jdbcType=VARCHAR},
+			  #{visitor,jdbcType=VARCHAR},
+			  #{plat,jdbcType=VARCHAR},
+			  #{position,jdbcType=VARCHAR},
+			  #{collecttime,jdbcType=TIMESTAMP},
+			  #{ext1,jdbcType=VARCHAR},
+			  #{ext2,jdbcType=VARCHAR},
+			  #{ext3,jdbcType=VARCHAR},
+		</trim>
+	</insert>
+	
+	<insert id="insertSelective">
+		INSERT INTO plat_showroom
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+			  id,
+			</if>
+			<if test="visitor != null and visitor != ''">
+			  visitor,
+			</if>
+			<if test="plat != null and plat != ''">
+			  plat,
+			</if>
+			<if test="position != null and position != ''">
+			  position,
+			</if>
+			<if test="collecttime != null and collecttime != ''">
+			  collecttime,
+			</if>
+			<if test="ext1 != null and ext1 != ''">
+			  ext1,
+			</if>
+			<if test="ext2 != null and ext2 != ''">
+			  ext2,
+			</if>
+			<if test="ext3 != null and ext3 != ''">
+			  ext3,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+			  #{id,jdbcType=VARCHAR},
+			</if>
+			<if test="visitor != null and visitor != ''">
+			  #{visitor,jdbcType=VARCHAR},
+			</if>
+			<if test="plat != null and plat != ''">
+			  #{plat,jdbcType=VARCHAR},
+			</if>
+			<if test="position != null and position != ''">
+			  #{position,jdbcType=VARCHAR},
+			</if>
+			<if test="collecttime != null and collecttime != ''">
+			  #{collecttime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="ext1 != null and ext1 != ''">
+			  #{ext1,jdbcType=VARCHAR},
+			</if>
+			<if test="ext2 != null and ext2 != ''">
+			  #{ext2,jdbcType=VARCHAR},
+			</if>
+			<if test="ext3 != null and ext3 != ''">
+			  #{ext3,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="update" parameterType="PlatShowroom">
+		UPDATE plat_showroom
+		 	<set>
+				visitor = #{visitor,jdbcType=VARCHAR},
+				plat = #{plat,jdbcType=VARCHAR},
+				position = #{position,jdbcType=VARCHAR},
+				collecttime = #{collecttime,jdbcType=TIMESTAMP},
+				ext1 = #{ext1,jdbcType=VARCHAR},
+				ext2 = #{ext2,jdbcType=VARCHAR},
+				ext3 = #{ext3,jdbcType=VARCHAR},
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateSelective" parameterType="PlatShowroom">
+		UPDATE plat_showroom
+		 	<set>
+				<if test="visitor != null and visitor != ''">
+				  visitor = #{visitor,jdbcType=VARCHAR},
+				</if>
+				<if test="plat != null and plat != ''">
+				  plat = #{plat,jdbcType=VARCHAR},
+				</if>
+				<if test="position != null and position != ''">
+				  position = #{position,jdbcType=VARCHAR},
+				</if>
+				<if test="collecttime != null and collecttime != ''">
+				  collecttime = #{collecttime,jdbcType=TIMESTAMP},
+				</if>
+				<if test="ext1 != null and ext1 != ''">
+				  ext1 = #{ext1,jdbcType=VARCHAR},
+				</if>
+				<if test="ext2 != null and ext2 != ''">
+				  ext2 = #{ext2,jdbcType=VARCHAR},
+				</if>
+				<if test="ext3 != null and ext3 != ''">
+				  ext3 = #{ext3,jdbcType=VARCHAR},
+				</if>
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM plat_showroom
+		WHERE id = #{id}
+	</update>
+
+	<update id="batchDelete">
+		DELETE FROM plat_showroom
+		WHERE id in
+		<if test="idList != null" >
+			<foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+			   #{item}
+			</foreach>
+   		 </if>
+	</update>
+
+	<insert id="batchInsert">
+			INSERT INTO plat_showroom
+			<trim prefix="(" suffix=")" suffixOverrides="," >
+					id,
+					visitor,
+					plat,
+					position,
+					collecttime,
+					ext1,
+					ext2,
+					ext3,
+			</trim>
+			VALUES
+			<foreach collection="list" item="item" index="index" separator="," >
+				<trim prefix="(" suffix=")" suffixOverrides="," >
+							#{item.id},
+							#{item.visitor},
+							#{item.plat},
+							#{item.position},
+							#{item.collecttime},
+							#{item.ext1},
+							#{item.ext2},
+							#{item.ext3},
+				</trim>
+			</foreach>
+	</insert>
+
+	<update id="executeUpdate" parameterType="java.lang.String">
+		#{sql}
+	</update>
+
+</mapper>

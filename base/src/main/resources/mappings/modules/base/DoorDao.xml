@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.base.dao.DoorDao">
+ 	<!-- <cache type="org.mybatis.caches.redis.RedisCache" /> -->
+	 <sql id="doorColumns">
+		  a.id,
+		  a.branchId,
+		  a.doorId,
+		  a.note,
+		  a.ip,
+		  a.doorType,
+		  a.create_date as "createDate",
+		  a.update_date as "updateDate",
+		  a.create_by as "createBy.id",
+		  u.name as "createBy.name",
+		  a.update_by as "updateBy.id",
+		  a.remarks,
+		  a.del_flag as "delFlag"
+	</sql>
+	
+	<sql id="doorJoins">
+		LEFT JOIN sys_user u ON a.create_by = u.id 
+		JOIN sys_office o on o.code = a.branchId
+	</sql>
+	
+	<!--查询门禁list  -->
+    <select id="findPage" resultType="Door" databaseId="mysql">
+		select
+			<include refid="doorColumns"/>
+		from door_manage a
+		<include refid="doorJoins"/>
+		<where>
+			<if test="doorId != null and doorId != ''">
+				AND locate(#{doorId},a.doorId) <![CDATA[ > ]]> 0 
+			</if>
+			<if test="doorType != null and doorType != ''">
+				AND a.doorType = #{doorType}
+			</if>
+			<!-- 数据范围过滤 -->
+		 	${sqlMap.dsf}
+		</where>
+		ORDER BY a.create_date DESC
+		<include refid="common.mysql_page" />
+	</select>
+	
+	<!--查询门禁数量  -->
+	<select id="findCount" resultType="int" databaseId="mysql">
+		select
+		  count(a.id)
+		from door_manage a
+		<include refid="doorJoins"/>
+		<where>
+			<if test="doorId != null and doorId != ''">
+				AND locate(#{doorId},a.doorId) <![CDATA[ > ]]> 0 
+			</if>
+			<if test="doorType != null and doorType != ''">
+				AND a.doorType = #{doorType}
+			</if>
+			<!-- 数据范围过滤 -->
+		 	${sqlMap.dsf}
+		</where>
+	</select>
+	
+	<select id="get" resultType="Door">
+		select
+			<include refid="doorColumns"/>
+		from door_manage a
+		<include refid="doorJoins"/>
+		where a.id = #{id} 
+	</select>
+
+	<!-- 插入门禁 -->
+	<insert id="insert">
+		INSERT INTO door_manage(
+			id, 
+			branchId,
+			doorId, 
+			note, 
+			ip, 
+			doorType, 
+			create_by, 
+			create_date, 
+			update_by, 
+			update_date, 
+			remarks, 
+			del_flag
+		) VALUES (
+			#{id}, 
+			#{branchId}, 
+			#{doorId}, 
+			#{note}, 
+			#{ip}, 
+			#{doorType}, 
+			#{createBy.id}, 
+			#{createDate}, 
+			#{updateBy.id}, 
+			#{updateDate}, 
+			#{remarks},  
+			#{delFlag}
+		)
+	</insert>
+	
+	<!-- 更新门禁信息  -->
+	<update id="update">
+		UPDATE door_manage SET 
+			doorId = #{doorId}, 
+			note = #{note}, 
+			ip = #{ip}, 
+			doorType = #{doorType},  
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}, 
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 删除门禁 -->
+	<delete id="delete">
+		DELETE FROM door_manage WHERE id = #{id}
+	</delete>
+	
+	<!--删除多个门禁信息  -->
+	<delete id="delDoors">
+		DELETE FROM door_manage WHERE id in
+		<foreach item="item" collection="array" index="index"
+		open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<select id="getDoorByDoorId" resultType="Door">
+		select
+			<include refid="doorColumns"/>
+		from door_manage a
+		<include refid="doorJoins"/>
+		where a.doorId = #{doorId} 
+		<!-- 数据范围过滤 -->
+	 	${sqlMap.dsf}
+	</select>
+	
+</mapper>

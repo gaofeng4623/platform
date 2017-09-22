@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>service</name>
+	<filePath>src/main/java/${packageName}/${moduleName}/service/${subModuleName}</filePath>
+	<fileName>${ClassName}Service.java</fileName>
+	<content><![CDATA[
+/**
+ *
+ */
+package ${packageName}.${moduleName}.service<#if subModuleName != "">.${subModuleName}</#if>;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.gtzn.common.persistence.Pager;
+import com.gtzn.common.service.CrudService;
+import ${packageName}.${moduleName}.entity<#if subModuleName != "">.${subModuleName}</#if>.${ClassName};
+
+/**
+ * ${functionName}Service
+ * @author ${functionAuthor}
+ * @version ${functionVersion}
+ */
+
+public interface ${ClassName}Service {
+
+	public List<${ClassName}> findList(${ClassName} ${className});
+	
+	public Pager<${ClassName}> findPage(Pager<${ClassName}> pager, ${ClassName} ${className});
+
+	public ${ClassName} select${ClassName}Info(String key);
+
+	public ${ClassName} select${ClassName}Info(${ClassName} ${className});
+	
+	public void save(${ClassName} ${className});
+
+	public void insert${ClassName}Selective(${ClassName} ${className});
+
+	public void update${ClassName}Selective(${ClassName} ${className});
+	
+	public void delete${ClassName}Info(${ClassName} ${className});
+
+	public void delete${ClassName}Info(String id);
+
+	public int batchDelete(String[] idList);
+
+	public int batchInsert(List<${ClassName}> list);
+
+	public int executeUpdate(String sql);
+
+	public void executeBatchUpdate(List<String> arraySql);
+	
+	public List<${ClassName}> findAllList(${ClassName} ${className});
+	
+}]]>
+	</content>
+</template>

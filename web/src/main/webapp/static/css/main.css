@@ -1,0 +1,59 @@
+.header_navigation{
+	background: none;
+}
+
+.easyui-tree {
+	background-color: #ededed;
+}
+
+.tree-node{
+	height: 26px;
+	line-height: 26px;
+	padding-left: 30px;
+	padding-top: 6px;
+}
+.tree-file {
+	background: none !important;
+	width:0px;
+}
+
+
+.tree-folder {
+	background: none !important;
+	width:2px;
+}
+
+.accordion .accordion-header{
+	padding: 12px 0;
+}
+
+.tree-node-selected {
+	background: #f9f9f9;
+	color: #01c375;
+	border-left:5px solid #01c375;
+}
+
+.panel-with-icon {
+	padding-left:30px;
+}
+
+*::-webkit-scrollbar{
+	width:1px;
+	width:1px\9;
+}
+.tree li {
+	overflow: hidden;
+}
+.panel-header {
+	background-color: #dcdcdc;
+	background: none;
+}
+.layout-expand {
+	background-color: #fff;
+}
+.select-color {
+    /* background-color: #e25325; */
+    background: #4a8bc3 !important;
+	/* color: #ffffff  !important; */
+	color: #fff  !important;
+}

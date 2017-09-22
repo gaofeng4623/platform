@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.home.dao.MemoDao">
+    
+	<sql id="memoColumns">
+		a.id AS "id",
+		a.mleft AS "mleft",
+		a.mtop AS "mtop",
+		a.content AS "content"
+	</sql>
+	
+	<sql id="memoJoins">
+	</sql>
+    
+	<select id="findAllList" resultType="Memo">
+		SELECT 
+			<include refid="memoColumns"/>
+		FROM plat_memo a
+		<include refid="memoJoins"/>
+		where createUser = #{createUser}
+	</select>
+
+	<insert id="insertSelective">
+		INSERT INTO plat_memo
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+			  id,
+			</if>
+			<if test="mleft != null and mleft != ''">
+			  mleft,
+			</if>
+			<if test="mtop != null and mtop != ''">
+			  mtop,
+			</if>
+			<if test="content != null and content != ''">
+			  content,
+			</if>
+			<if test="createUser != null and createUser != ''">
+			  createUser
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+			  #{id,jdbcType=VARCHAR},
+			</if>
+			<if test="mleft != null and mleft != ''">
+			  #{mleft,jdbcType=VARCHAR},
+			</if>
+			<if test="mtop != null and mtop != ''">
+			  #{mtop,jdbcType=VARCHAR},
+			</if>
+			<if test="content != null and content != ''">
+			  #{content,jdbcType=VARCHAR},
+			</if>
+			<if test="createUser != null and createUser != ''">
+			  #{createUser,jdbcType=VARCHAR}
+			</if>
+		</trim>
+	</insert>
+	<update id="updateSelective" parameterType="Memo">
+		UPDATE plat_memo
+		 	<set>
+				<if test="content != null and content != ''">
+				  content = #{content,jdbcType=VARCHAR},
+				</if>
+				<if test="mleft != null and mleft != ''">
+				  mleft = #{mleft,jdbcType=VARCHAR},
+				</if>
+				<if test="mtop != null and mtop != ''">
+				  mtop = #{mtop,jdbcType=VARCHAR},
+				</if>
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM plat_memo
+		WHERE id = #{id}
+	</update>
+</mapper>

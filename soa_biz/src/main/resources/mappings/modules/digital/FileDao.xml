@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.digital.dao.FileDao">
+
+    <!-- 根据条件获取子文件夹列表 -->
+    <select id="findList" resultType="File">
+        SELECT
+        t1.id,
+        t1.folderId AS 'folder.id',
+        t1.title,
+        t1.keyWords,
+        t1.fileName,
+        t1.flag,
+        t1.creater AS 'user.id',
+        t1.createTime AS createDate,
+        t1.attGroupId,
+        t3.`name` AS 'user.name'
+        FROM
+        plat_repository_file t1,
+        sys_user t3
+        <where>
+            <if test='folder.id != null and folder.id != "0"'>
+                t1.folderId = #{folder.id}
+            </if>
+            <if test='title != null and title != "0"'>
+                AND (t1.title LIKE concat(concat('%',#{title}),'%') OR t1.keyWords LIKE
+                concat(concat('%',#{title}),'%'))
+            </if>
+            AND t1.creater = t3.id
+        </where>
+        ORDER BY t1.createTime DESC
+        <include refid="common.mysql_page"/>
+    </select>
+
+    <!-- 根据条件获取子文件夹列表的数量 -->
+    <select id="findCount" resultType="int">
+        SELECT
+        count(1)
+        FROM
+        plat_repository_file t1,
+        sys_user t3
+        <where>
+            <if test='folder.id != null and folder.id != "0"'>
+                t1.folderId = #{folder.id}
+            </if>
+            <if test='title != null and title != "0"'>
+                AND (t1.title LIKE concat(concat('%',#{title}),'%') OR t1.keyWords LIKE
+                concat(concat('%',#{title}),'%'))
+            </if>
+            AND t1.creater = t3.id
+        </where>
+    </select>
+    <!-- 新增一个文件夹 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="File">
+        INSERT INTO plat_repository_file (
+            folderId,
+            title,
+            keyWords,
+            fileName,
+            content,
+            flag,
+            creater,
+            createTime,
+            attGroupId
+        )
+        VALUES
+            (#{folder.id}, #{title}, #{keyWords}, #{fileName}, #{content}, #{flag}, #{user.id}, #{createDate},
+             #{attGroupId})
+    </insert>
+
+    <!-- 删除一个文件夹 -->
+    <delete id="delete">
+        DELETE FROM plat_repository_file
+        WHERE id = #{id}
+    </delete>
+
+    <!-- 通过条件获取文件 -->
+    <select id="findFile" resultType="File">
+        <!--SELECT *-->
+        <!--FROM-->
+        <!--plat_repository_file-->
+        <!--<where>-->
+        <!--<if test="id != null and id != ''">-->
+        <!--id = #{id}-->
+        <!--</if>-->
+        <!--<if test="folder.id != null and folder.id != ''">-->
+        <!--AND folderId = #{folder.id}-->
+        <!--</if>-->
+        <!--<if test="title != null and title != ''">-->
+        <!--AND title like #{title}-->
+        <!--</if>-->
+        <!--<if test="keyWords != null and keyWords != ''">-->
+        <!--AND keyWords like #{author.name}-->
+        <!--</if>-->
+        <!--</where>-->
+        <!--WHERE-->
+        <!--folderId = #{folder.id}-->
+        <!--AND title = #{title}-->
+        <!--AND keyWords = #{keyWords}-->
+        <!--AND content = #{content}-->
+    </select>
+
+    <!-- 通过file id获取File -->
+    <select id="get" resultType="File">
+        SELECT
+            t1.id,
+            t1.folderId   AS 'folder.id',
+            t1.title,
+            t1.keyWords,
+            t1.fileName,
+            t1.flag,
+            t1.creater    AS 'user.id',
+            t1.createTime AS createDate,
+            t1.content,
+            t1.attGroupId
+        FROM plat_repository_file t1
+        WHERE t1.id = #{id}
+    </select>
+
+    <!-- 通过文件id编辑文件信息 -->
+    <update id="update">
+        UPDATE plat_repository_file
+        SET
+            title   = #{title}, keyWords = #{keyWords}, content = #{content},
+            creater = #{user.id}, createTime = #{createDate}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 通过文件的groupId获取此文件所拥有的附件 -->
+    <select id="getAttachmentByGroupId" resultType="Attachment">
+        SELECT
+            t1.id,
+            t1.groupId,
+            t1.fileName,
+            t1.filePath   AS 'url',
+            t1.fileSize,
+            t1.creater    AS 'user.id',
+            t1.createTime AS 'createDate',
+            t2.name       AS 'user.name'
+        FROM plat_attachment t1, sys_user t2
+        WHERE groupId = #{attGroupId}
+              AND t1.creater = t2.id
+    </select>
+</mapper>

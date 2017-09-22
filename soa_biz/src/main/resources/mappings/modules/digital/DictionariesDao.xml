@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gtzn.modules.digital.dao.DictionariesDao" >
+  <resultMap id="BaseResultMap" type="com.gtzn.modules.digital.entity.Dictionaries" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="entitiesNo" property="entitiesNo" jdbcType="INTEGER" />
+    <result column="electronicsNo" property="electronicsNo" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, title,entitiesNo,electronicsNo
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from plat_dictionaries
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from plat_dictionaries
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.gtzn.modules.digital.entity.Dictionaries" >
+    insert into plat_dictionaries (id, title)
+    values (#{id,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.gtzn.modules.digital.entity.Dictionaries" >
+    insert into plat_dictionaries
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="title != null" >
+        title,
+      </if>
+      <if test="entitiesNo != null" >
+        entitiesNo,
+      </if>
+      <if test="electronicsNo != null" >
+        electronicsNo,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="title != null" >
+        #{title,jdbcType=VARCHAR},
+      </if>
+       <if test="entitiesNo != null" >
+        #{entitiesNo,jdbcType=INTEGER},
+      </if>
+       <if test="electronicsNo != null" >
+        #{electronicsNo,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.gtzn.modules.digital.entity.Dictionaries" >
+    update plat_dictionaries
+    <set >
+      <if test="title != null" >
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.gtzn.modules.digital.entity.Dictionaries" >
+    update plat_dictionaries
+    set title = #{title,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+ 
+	  <select id="selectByName" resultMap="BaseResultMap" parameterType="String" >
+    select 
+       <include refid="Base_Column_List" />
+    from plat_dictionaries
+    where title = #{name}
+  </select> 
+   <update id="updateDic" parameterType="com.gtzn.modules.digital.entity.Dictionaries" >
+    update plat_dictionaries
+    <set >
+      <if test="entitiesNo != null" >
+        entitiesNo = #{entitiesNo,jdbcType=VARCHAR},
+      </if>
+      <if test="electronicsNo != null" >
+        electronicsNo = #{electronicsNo,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where title = #{title,jdbcType=INTEGER}
+  </update>
+   <update id="updateList" parameterType="com.gtzn.modules.digital.entity.Dictionaries" >
+    update plat_dictionaries
+    <set >
+     entitiesNo =0,
+     electronicsNo = 0
+     
+     <!--  <if test="entitiesNo != null" >
+        entitiesNo = #{entitiesNo,jdbcType=VARCHAR},
+      </if>
+      <if test="electronicsNo != null" >
+        electronicsNo = #{electronicsNo,jdbcType=VARCHAR},
+      </if> -->
+    </set>
+  
+  </update>
+  <select id="queryDictionariesList" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from plat_dictionaries
+  </select>
+</mapper>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.platform.dao.CockpitManageDao">
+    
+	<select id="getInformStaticsByMonth" resultType="java.util.HashMap">
+		SELECT
+			count(1) AS num,
+			LEFT(a.releaseDate,7) AS 'date'
+		FROM
+			plat_information a
+		GROUP BY LEFT(a.releaseDate,7)
+	</select>
+	
+	
+</mapper>

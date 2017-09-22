@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.security.dao.SecurityStaticsDao">
+    
+   	<select id="getRoomList" resultType="String">
+		SELECT
+			fId
+		FROM
+			t_room 
+		WHERE
+			fMaxT != 0 
+		AND fMinT != 0 
+		AND fMaxH != 0
+		AND fMinH != 0
+	</select>
+	
+	<select id="getRoomTHStaticsById" resultType="java.util.HashMap">
+		SELECT
+			wsd.fRoomName AS roomName,
+			wsd.fTemperature AS temperature,
+			wsd.fHumidity AS humidity
+		FROM
+			t_history_wsd wsd
+		WHERE
+			wsd.fCreateTime = (
+				SELECT
+					max(h.fcreatetime)
+				FROM
+					t_history_wsd h
+				WHERE
+					h.fRoomId = #{roomId}
+			)
+		AND wsd.fRoomId = #{roomId}
+	</select>
+	
+	<select id="getAlarmStatics" resultType="java.util.HashMap">
+		SELECT
+			COUNT(1) AS num,
+			fAlarmTypeName AS category 
+		FROM
+			t_alarm
+		GROUP BY fAlarmTypeId
+	</select>
+	
+	<select id="getRoomTHStaticsByDay" resultType="java.util.HashMap">
+		SELECT
+			AVG(wsd.fTemperature) AS temperature,
+			AVG(wsd.fHumidity) AS humidity,
+			LEFT (wsd.fcreatetime, 10) AS date
+		FROM
+			t_history_wsd wsd
+		WHERE
+			wsd.fRoomName = #{roomName}
+		GROUP BY
+			LEFT (wsd.fcreatetime, 10);
+	</select>
+	
+	<select id="getRoomTHStaticsByMonth" resultType="java.util.HashMap">
+		SELECT
+			min(wsd.fTemperature) AS minT,
+			max(wsd.fTemperature) AS maxT,
+			min(wsd.fHumidity) AS minH,
+			max(wsd.fHumidity) AS maxH,
+			LEFT (wsd.fcreatetime, 7) AS date
+		FROM
+			t_history_wsd wsd
+		WHERE
+			wsd.fRoomName = #{roomName}
+		GROUP BY
+			LEFT (wsd.fcreatetime, 7);
+	</select>
+	
+	<select id="getAlarmStaticsByMonth" resultType="java.util.HashMap">
+		SELECT
+			count(1) AS num,
+			LEFT (fCreateTime, 7) AS date
+		FROM
+			t_alarm
+		WHERE
+			fAlarmTypeName = #{alarmTypeName}
+		GROUP BY
+			LEFT (fCreateTime, 7)
+	</select>
+	
+	<select id="getAlarmStaticsByRoom" resultType="java.util.HashMap">
+		SELECT
+			count(1) AS num,
+			fRoomName AS name
+		FROM
+			t_alarm
+		WHERE
+			fAlarmTypeName = #{alarmTypeName}
+		GROUP BY
+			fRoomName
+	</select>
+	
+	<select id="getAlarmStaticsByDevice" resultType="java.util.HashMap">
+		SELECT
+			count(1) AS num,
+			TIMESTAMPDIFF(SECOND,fCreateTime,fLastAlarmTime) AS duration,
+			CONCAT(
+				fRoomName,
+				'-',
+				fAlarmDeviceName
+			) AS name
+		FROM
+			t_alarm
+		WHERE
+			fAlarmTypeName = #{alarmTypeName}
+		GROUP BY
+			fAlarmDeviceName,
+			fRoomName;
+	</select>
+	
+	<select id="getAlarmCount" resultType="int">
+		SELECT
+			count(1) AS num
+		FROM
+			t_alarm
+	</select>
+	
+	
+	
+</mapper>

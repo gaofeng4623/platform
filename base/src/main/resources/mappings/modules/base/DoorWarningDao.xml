@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.base.dao.DoorWarningDao">
+    
+	<sql id="doorWarningColumns">
+		a.id AS "id",
+		a.branchid AS "branchId",
+		a.doorid AS "door.doorId",
+		a.rfid AS "rfid",
+		a.warndate AS "warnDate",
+		a.warnreason AS "warnReason",
+		a.handler AS "handler",
+		a.handleresult AS "handleResult",
+		a.handledate AS "handleDate",
+		(SELECT u.name FROM sys_user u WHERE u.id = a.handler) handlerName
+	</sql>
+	
+	<sql id="doorWarningJoins">
+		JOIN door_manage d ON d.doorId = a.doorId and d.branchId = a.branchId
+		JOIN sys_office o on o.code = a.branchId
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="findPage" resultType="DoorWarning">
+		SELECT 
+			<include refid="doorWarningColumns"/>,
+			d.note AS "door.note",
+			d.doorType AS "door.doorType",
+			d.ip AS "door.ip"
+		FROM door_warning a
+		<include refid="doorWarningJoins"/>
+		<where>
+			<if test="door != null and door.doorId != null and door.doorId != ''">
+				AND a.doorId = #{door.doorId}
+			</if>
+			<if test="door != null and door.doorType != null and door.doorType != ''">
+				AND d.doorType = #{door.doorType}
+			</if>
+			<if test="warningTimeStart != null and warningTimeStart != ''">
+				AND a.warnDate <![CDATA[>=]]> #{warningTimeStart} 
+			</if>
+			<if test="warningTimeEnd != null and warningTimeEnd != ''">
+				AND a.warnDate <![CDATA[<=]]> #{warningTimeEnd}
+			</if>
+			<!-- 数据范围过滤 -->
+			${sqlMap.dsf}
+		</where>
+		ORDER BY a.warnDate DESC
+		<include refid="common.mysql_page" />
+	</select>
+	<!-- 分页查询 查询总数 -->
+	<select id="findCount" resultType="int">
+		SELECT 
+			count(a.id)
+		FROM door_warning a
+		<include refid="doorWarningJoins"/>
+		<where>
+			<if test="door != null and door.doorId != null and door.doorId != ''">
+				AND a.doorId = #{door.doorId}
+			</if>
+			<if test="door != null and door.doorType != null and door.doorType != ''">
+				AND d.doorType = #{door.doorType}
+			</if>
+			<if test="warningTimeStart != null and warningTimeStart != ''">
+				AND a.warnDate <![CDATA[>=]]> #{warningTimeStart} 
+			</if>
+			<if test="warningTimeEnd != null and warningTimeEnd != ''">
+				AND a.warnDate <![CDATA[<=]]> #{warningTimeEnd}
+			</if>
+			<!-- 数据范围过滤 -->
+		 	${sqlMap.dsf}
+		</where>
+	</select>
+	<!-- 处理门禁报警 -->
+	<update id="handleWarning">
+		UPDATE door_warning 
+			SET handleResult = #{doorWarning.handleResult},
+				handler = #{doorWarning.updateBy.id},
+				handleDate=  #{doorWarning.updateBy.updateDate}
+		where id in  
+		<foreach collection="ids" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+</mapper>

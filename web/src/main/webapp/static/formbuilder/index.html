@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+ <meta charset="utf-8">
+  <title>Form Builder</title>
+  <meta name="description" content="">
+  <link rel="stylesheet" href="vendor/css/vendor.css" />
+  <link rel="stylesheet" href="dist/formbuilder.css" />
+  <style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: #444;
+    font-family: sans-serif;
+  }
+
+  .fb-main {
+    background-color: #fff;
+    border-radius: 5px;
+    min-height: 600px;
+  }
+
+  input[type=text] {
+    height: 26px;
+    margin-bottom: 3px;
+  }
+
+  select {
+    margin-bottom: 5px;
+    font-size: 40px;
+  }
+  </style>
+</head>
+<body>
+  <div class='fb-main'></div>
+
+  <script src="vendor/js/vendor.js"></script>
+  <script src="dist/formbuilder.js"></script>
+
+  <script>
+    $(function(){
+      fb = new Formbuilder({
+        selector: '.fb-main',
+        bootstrapData: [
+			
+			{"label":"姓名","field_type":"text","required":true,"field_options":{"size":"small","description":"请输入名"},"cid":"c18"},
+			{"label":"年龄","field_type":"number","required":true,"field_options":{"description":"请输入年龄"},"cid":"c26"},
+			{"label":"生日","field_type":"date","required":true,"field_options":{"description":"请输入生日"},"cid":"c30"},
+			{"label":"爱好","field_type":"checkboxes","required":true,"field_options":{"options":[{"label":"游泳","checked":false},{"label":"跑步","checked":false}],"description":"请选择爱好"},"cid":"c34"},
+			{"label":"别","field_type":"radio","required":true,"field_options":{"options":[{"label":"男","checked":true},{"label":"女","checked":false}],"description":"请选择性别"},"cid":"c38"},
+			{"label":"职业","field_type":"dropdown","required":true,"field_options":{"options":[{"label":"教师","checked":true},{"label":"工人","checked":false}],"include_blank_option":true,"description":"请选择职业"},"cid":"c42"}
+        ]
+      });
+
+      fb.on('save', function(payload){
+        console.log(payload);
+      })
+    });
+  </script>
+
+</body>
+</html>

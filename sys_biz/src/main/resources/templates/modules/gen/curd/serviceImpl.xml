@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>service</name>
+	<filePath>src/main/java/${packageName}/${moduleName}/service/impl/${subModuleName}</filePath>
+	<fileName>${ClassName}ServiceImpl.java</fileName>
+	<content><![CDATA[
+/**
+ *
+ */
+package ${packageName}.${moduleName}.service<#if subModuleName != "">.${subModuleName}</#if>.impl;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.gtzn.common.persistence.Pager;
+import com.gtzn.common.service.CrudService;
+import ${packageName}.${moduleName}.entity<#if subModuleName != "">.${subModuleName}</#if>.${ClassName};
+import ${packageName}.${moduleName}.dao<#if subModuleName != "">.${subModuleName}</#if>.${ClassName}Dao;
+import ${packageName}.${moduleName}.service<#if subModuleName != "">.${subModuleName}</#if>.${ClassName}Service; 
+
+/**
+ * ${functionName}Service
+ * @author ${functionAuthor}
+ * @version ${functionVersion}
+ */
+@Service("${className}")
+@Transactional(readOnly = true)
+public class ${ClassName}ServiceImpl extends CrudService<${ClassName}Dao, ${ClassName}> implements ${ClassName}Service{
+
+	public List<${ClassName}> findList(${ClassName} ${className}) {
+		return super.findList(${className});
+	}
+	
+	public Pager<${ClassName}> findPage(Pager<${ClassName}> pager, ${ClassName} ${className}) {
+		return super.findPage(pager, ${className});
+	}
+
+	public ${ClassName} select${ClassName}Info(String id) {
+		return super.get(id);
+	}
+
+	public ${ClassName} select${ClassName}Info(${ClassName} ${className}) {
+		return super.get(${className});
+	}
+
+	@Transactional(readOnly = false)
+	public void save(${ClassName} ${className}) {
+		super.save(${className});
+	}
+
+	@Transactional(readOnly = false)
+	public void insert${ClassName}Selective(${ClassName} ${className}) {
+		super.insertSelective(${className});
+	}
+
+	@Transactional(readOnly = false)
+	public void update${ClassName}Selective(${ClassName} ${className}) {
+		super.updateSelective(${className});
+	}
+
+	@Transactional(readOnly = false)
+	public void delete${ClassName}Info(${ClassName} ${className}) {
+		super.delete(${className});
+	}
+
+	@Transactional(readOnly = false)
+	public void delete${ClassName}Info(String id) {
+		super.delete(id);
+	}
+
+	@Transactional(readOnly = false)
+	public int batchDelete(String[] idList) {
+		return super.batchDelete(idList);
+	}
+
+	@Transactional(readOnly = false)
+	public int batchInsert(List<${ClassName}> list) {
+		return super.batchInsert(list);
+	}
+
+	@Transactional(readOnly = false)
+	public int executeUpdate(String sql) {
+		return super.executeUpdate(sql);
+	}
+
+	@Transactional(readOnly = false)
+	public void executeBatchUpdate(List<String> arraySql) {
+		for (String sql : arraySql) {
+			super.executeUpdate(sql);
+		}
+	}
+
+	public List<${ClassName}> findAllList(${ClassName} ${className}){
+		return super.findAllList(${className});
+	}
+}]]>
+	</content>
+</template>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>dao</name>
+	<filePath>src/genCode/</filePath>
+	<fileName>genCodeSet.xml</fileName>
+	<content><![CDATA[
+	
+	dubbo-service.xml
+
+	<dubbo:service ref="${className}"  interface="${packageName}.${moduleName}.service<#if subModuleName != "">.${subModuleName}</#if>.${ClassName}Service"/>
+	
+	
+	spring-context-service.xml
+	
+	<dubbo:reference id="${className}"  interface="${packageName}.${moduleName}.service<#if subModuleName != "">.${subModuleName}</#if>.${ClassName}Service"/>
+	
+	菜单配置
+	/${urlPrefix}/list
+	左树右表 菜单配置
+	/${urlPrefix}/index
+	查看权限
+	${permissionPrefix}:view
+	编辑权限
+	${permissionPrefix}:edit
+]]>
+	</content>
+</template>

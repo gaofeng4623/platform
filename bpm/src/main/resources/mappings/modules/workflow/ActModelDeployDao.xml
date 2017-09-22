@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.workflow.dao.ActModelDeployDao">
+    
+	<sql id="actModelDeployColumns">
+		a.id AS "id",
+		a.modelkey AS "modelkey",
+		a.deployid AS "deployid",
+		a.modelversion AS "modelversion",
+		a.modelid AS "modelid"
+	</sql>
+    
+	<select id="get" resultType="ActModelDeploy">
+		SELECT 
+			<include refid="actModelDeployColumns"/>
+		FROM act_model_deploy a
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findPage" resultType="ActModelDeploy">
+		
+	</select>
+	<select id="findCount" resultType="int">
+		
+	</select>
+	
+	<select id="findAllList" resultType="ActModelDeploy">
+		SELECT 
+			a.id AS "id",
+			a.modelkey AS "modelkey",
+			a.deployid AS "deployid",
+			a.modelversion AS "modelversion",
+			a.modelid AS "modelid",
+			b.NAME_ AS "modelname"
+		FROM act_model_deploy a,act_re_model b
+		WHERE a.modelid = b.ID_
+			<if test="modelkey != null and modelkey != ''">
+				AND a.modelkey = #{modelkey}
+			</if>
+			<if test="deployid != null and deployid != ''">
+				AND a.deployid = #{deployid}
+			</if>
+			<if test="modelid != null and modelid != ''">
+				AND a.modelid = #{modelid}
+			</if>
+				
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO act_model_deploy(
+			id,
+			modelkey,
+			deployid,
+			modelversion,
+			modelid
+		) VALUES (
+			#{id},
+			#{modelkey},
+			#{deployid},
+			#{modelversion},
+			#{modelid}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE act_model_deploy SET 	
+			modelkey = #{modelkey},
+			deployid = #{deployid},
+			modelid = #{modelid},
+			modelversion = #{modelversion}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM act_model_deploy
+		<where>
+		
+		<if test="modelkey != null and modelkey != ''">
+				AND modelkey = #{modelkey}
+			</if>
+			<if test="deployid != null and deployid != ''">
+				AND deployid = #{deployid}
+			</if>
+			<if test="modelid != null and modelid != ''">
+				AND modelid = #{modelid}
+			</if>
+			
+		</where>
+	</update>
+	
+</mapper>

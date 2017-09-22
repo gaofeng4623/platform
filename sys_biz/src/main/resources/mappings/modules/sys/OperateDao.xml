@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.sys.dao.OperateDao">
+    
+	<sql id="operateColumns">
+		a.id AS "id",
+		a.userNo AS "userNo",
+		a.username AS "userName",
+		a.operationrecord AS "operationRecord",
+		a.createdate AS "createDate",
+		a.ip AS "ip",
+		a.module AS "module",
+		a.operationtype AS "operationType",
+		a.branchId,
+		a.eqType
+	</sql>
+	
+	<select id="get" resultType="Operate">
+		SELECT 
+			<include refid="operateColumns"/>
+		FROM sys_operate a
+		WHERE a.id = #{id}
+	</select>
+	<sql id="operateWhere">
+		<where>
+			<if test="userNo != null and userNo != ''">
+				AND a.userNo = #{userNo}
+			</if>
+			<if test="userName != null and userName != ''">
+				AND a.username = #{userName}
+			</if>
+			<if test="operationRecord != null and operationRecord != ''">
+				AND a.operationrecord = #{operationRecord}
+			</if>
+			<choose>
+                <when test="beginDate != null and beginDate != '' and endDate != null and endDate != ''">
+					AND a.createdate BETWEEN "${beginDate}" AND "${endDate} 23:59:59"
+                </when>
+                 <when test="beginDate != null and beginDate != ''">
+					<![CDATA[ AND a.createdate >= #{beginDate}]]> 
+                </when>
+                <when test=" endDate != null and endDate != ''">
+					 <![CDATA[ AND a.createdate <= #{endDate}  ]]>
+                </when>
+         	</choose>
+			
+			<if test="ip != null and ip != ''">
+				AND a.ip = #{ip}
+			</if>
+			<if test="module != null and module != ''">
+				AND a.module = #{module}
+			</if>
+			<if test="operationType != null and operationType != ''">
+				AND a.operationtype = #{operationType}
+			</if>
+			<if test="eqType != null and eqType != ''">
+				AND a.eqType = #{eqType}
+			</if>
+			
+		</where>
+	</sql>
+	<select id="findPage" resultType="Operate">
+		SELECT 
+			<include refid="operateColumns"/>
+		FROM sys_operate a
+		<include refid="operateWhere"/>
+		ORDER BY a.createdate DESC
+		<include refid="common.mysql_page" />
+	</select>
+	<select id="findCount" resultType="int">
+		SELECT 
+			count(a.id)
+		FROM sys_operate a
+		<include refid="operateWhere"/>
+		ORDER BY a.createdate DESC
+	</select>
+	
+	
+	<insert id="insert">
+		INSERT INTO sys_operate(
+			id,
+			userNo,
+			username,
+			operationrecord,
+			createdate,
+			ip,
+			module,
+			operationtype,
+			eqType,
+			branchId
+		) VALUES (
+			#{id},
+			#{userNo},
+			#{userName},
+			#{operationRecord},
+			#{createDate},
+			#{ip},
+			#{module},
+			#{operationType},
+			#{eqType},
+			#{branchId}
+		)
+	</insert>
+
+	
+	<update id="delete">
+		DELETE FROM sys_operate
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

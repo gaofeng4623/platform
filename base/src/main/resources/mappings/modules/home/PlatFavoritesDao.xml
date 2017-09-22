@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.home.dao.PlatFavoritesDao">
+    
+	<sql id="platFavoritesColumns">
+		a.id AS "id",
+		a.fav_name AS "favName",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="platFavoritesJoins">
+	</sql>
+    
+	<select id="get" resultType="PlatFavorites">
+		SELECT 
+			<include refid="platFavoritesColumns"/>
+		FROM plat_favorites a
+		<include refid="platFavoritesJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findPage" resultType="PlatFavorites">
+		SELECT 
+			<include refid="platFavoritesColumns"/>
+		FROM plat_favorites a
+		<include refid="platFavoritesJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		ORDER BY a.update_date DESC
+			<include refid="common.mysql_page" />
+	</select>
+	<select id="findCount" resultType="int">
+		SELECT 
+			count(a.id)
+		FROM plat_favorites a
+		<include refid="platFavoritesJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		ORDER BY a.update_date DESC
+	</select>
+	
+	<select id="findAllList" resultType="PlatFavorites">
+		SELECT 
+			<include refid="platFavoritesColumns"/>
+		FROM plat_favorites a
+		<include refid="platFavoritesJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="createBy!=null and createBy.id!=null and createBy.id!=''">
+				AND a.create_by=#{createBy.id}				
+			</if>
+		</where>		
+	</select>
+
+	<insert id="insert">
+		INSERT INTO plat_favorites
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			  id,
+			  fav_name,
+			  create_by,
+			  create_date,
+			  update_by,
+			  update_date,
+			  remarks,
+			  del_flag,
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			  #{id,jdbcType=VARCHAR},
+			  #{favName,jdbcType=VARCHAR},
+			  #{createBy.id,jdbcType=VARCHAR},
+			  #{createDate,jdbcType=TIMESTAMP},
+			  #{updateBy.id,jdbcType=VARCHAR},
+			  #{updateDate,jdbcType=TIMESTAMP},
+			  #{remarks,jdbcType=VARCHAR},
+			  #{delFlag,jdbcType=CHAR},
+		</trim>
+	</insert>
+	
+	<insert id="insertSelective">
+		INSERT INTO plat_favorites
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+			  id,
+			</if>
+			<if test="favName != null and favName != ''">
+			  fav_name,
+			</if>
+			<if test="createBy.id != null and createBy.id != ''">
+			  create_by,
+			</if>
+			<if test="createDate != null and createDate != ''">
+			  create_date,
+			</if>
+			<if test="updateBy.id != null and updateBy.id != ''">
+			  update_by,
+			</if>
+			<if test="updateDate != null and updateDate != ''">
+			  update_date,
+			</if>
+			<if test="remarks != null and remarks != ''">
+			  remarks,
+			</if>
+			<if test="delFlag != null and delFlag != ''">
+			  del_flag,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+			  #{id,jdbcType=VARCHAR},
+			</if>
+			<if test="favName != null and favName != ''">
+			  #{favName,jdbcType=VARCHAR},
+			</if>
+			<if test="createBy.id != null and createBy.id != ''">
+			  #{createBy.id,jdbcType=VARCHAR},
+			</if>
+			<if test="createDate != null and createDate != ''">
+			  #{createDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateBy.id != null and updateBy.id != ''">
+			  #{updateBy.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateDate != null and updateDate != ''">
+			  #{updateDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="remarks != null and remarks != ''">
+			  #{remarks,jdbcType=VARCHAR},
+			</if>
+			<if test="delFlag != null and delFlag != ''">
+			  #{delFlag,jdbcType=CHAR},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="update" parameterType="PlatFavorites">
+		UPDATE plat_favorites
+		 	<set>
+				fav_name = #{favName,jdbcType=VARCHAR},
+				update_by = #{updateBy.id,jdbcType=VARCHAR},
+				update_date = #{updateDate,jdbcType=TIMESTAMP},
+				remarks = #{remarks,jdbcType=VARCHAR},
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateSelective" parameterType="PlatFavorites">
+		UPDATE plat_favorites
+		 	<set>
+				<if test="favName != null and favName != ''">
+				  fav_name = #{favName,jdbcType=VARCHAR},
+				</if>
+				<if test="updateBy.id != null and updateBy.id != ''">
+				  update_by = #{updateBy.id,jdbcType=VARCHAR},
+				</if>
+				<if test="updateDate != null and updateDate != ''">
+				  update_date = #{updateDate,jdbcType=TIMESTAMP},
+				</if>
+				<if test="remarks != null and remarks != ''">
+				  remarks = #{remarks,jdbcType=VARCHAR},
+				</if>
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM plat_favorites 
+		WHERE id = #{id}
+	</update>
+
+	<update id="batchDelete">
+		UPDATE plat_favorites SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id in
+		<if test="idList != null" >
+			<foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+			   #{item}
+			</foreach>
+   		 </if>
+	</update>
+
+	<insert id="batchInsert">
+			INSERT INTO plat_favorites
+			<trim prefix="(" suffix=")" suffixOverrides="," >
+					id,
+					fav_name,
+					create_by,
+					create_date,
+					update_by,
+					update_date,
+					remarks,
+					del_flag,
+			</trim>
+			VALUES
+			<foreach collection="list" item="item" index="index" separator="," >
+				<trim prefix="(" suffix=")" suffixOverrides="," >
+							#{item.id},
+							#{item.fav_name},
+							#{item.create_by},
+							#{item.create_date},
+							#{item.update_by},
+							#{item.update_date},
+							#{item.remarks},
+							#{item.del_flag},
+				</trim>
+			</foreach>
+	</insert>
+
+	<update id="executeUpdate" parameterType="java.lang.String">
+		#{sql}
+	</update>
+
+</mapper>

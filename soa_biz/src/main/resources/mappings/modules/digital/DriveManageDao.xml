@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.digital.dao.DriveManageDao">
+    
+	<select id="getUseCount" resultType="int">
+		SELECT
+			COUNT (1)
+		FROM
+			y_archive_use u,
+			y_archive_use_detail detail
+		WHERE
+			u.id = detail.applyid
+		AND u.state = '2'
+	</select>
+	
+	<select id="getBorrowCount" resultType="int">
+		SELECT
+			COUNT (1)
+		FROM
+			y_borrowapply a,
+			y_borrowapply_detail detail
+		WHERE
+			a.id = detail.apply_id
+		AND a.state = '2' and a.applytype = 1
+	</select>
+	
+	<select id="getReceiveCount" resultType="int">
+		SELECT
+			CASE when sum(outcount) is NULL then 0 ELSE sum(outcount) END AS num
+		FROM
+			y_archiveaccept 
+	</select>
+	
+	<select id="getCollectCount" resultType="int">
+		SELECT
+			CASE when sum(incount) is NULL then 0 ELSE sum(incount) END AS num
+		FROM
+			y_archivecollect 
+		WHERE
+			state = '2'
+	</select>
+	
+	<select id="getAuthCount" resultType="int">
+		SELECT
+			CASE when sum(amount) is NULL then 0 ELSE sum(amount) END AS num
+		FROM
+			y_archiveauth 
+		WHERE
+			state = '2'
+	</select>
+	
+	<select id="getCollectStaticsByType" resultType="java.util.HashMap">
+		SELECT
+			CASE when sum(a.incount) is NULL then 0 ELSE sum(a.incount) END AS num,
+			CONVERT(varchar(7),a.create_date,23) AS 'date'
+		FROM
+			y_archivecollect a
+		WHERE
+			a.type = #{type}
+		GROUP BY CONVERT(varchar(7),a.create_date,23)
+	</select>
+	
+	<select id="getAuthStaticsByType" resultType="java.util.HashMap">
+		SELECT
+			CASE when sum(a.amount) is NULL then 0 ELSE sum(a.amount) END AS num,
+			CONVERT(varchar(4),a.create_date,23) AS 'date'
+		FROM
+			y_archiveauth a
+		WHERE
+			a.type = #{type}
+		GROUP BY CONVERT(varchar(4),a.create_date,23)
+	</select>
+	
+	<select id="getTransferStaticsByYear" resultType="java.util.HashMap">
+		SELECT
+			CASE when sum(a.outcount) is NULL then 0 ELSE sum(a.outcount) END AS num,
+			CONVERT(varchar(4),a.create_date,23) AS 'date'
+		FROM
+			y_archiveaccept a
+		GROUP BY CONVERT(varchar(4),a.create_date,23)
+	</select>
+	
+	<select id="getCollectStaticsByDays" resultType="java.util.HashMap">
+		SELECT
+			CASE when sum(a.incount) is NULL then 0 ELSE sum(a.incount) END AS num,
+			CONVERT(varchar(10),a.create_date,23) AS 'date'
+		FROM
+			y_archivecollect a
+		WHERE
+			a.type = #{type}
+		GROUP BY CONVERT(varchar(10),a.create_date,23)
+	</select>
+	
+	<select id="getCollectCostStatics" resultType="java.util.HashMap">
+		SELECT
+			a.futurecost,
+			a.lastcost, 
+			a.incount 
+		FROM
+			y_archivecollect a
+		WHERE
+			a.type = #{type}
+			AND CONVERT(varchar(7),a.create_date,23) = #{category}
+	</select>
+	
+	<select id="getCollectTypeStatics" resultType="java.util.HashMap">
+		SELECT 
+			a.archiveType AS type,
+			CASE when sum(a.incount) is NULL then 0 ELSE sum(a.incount) END AS num
+		FROM
+			y_archivecollect a
+		WHERE
+			a.type = #{type}
+			AND CONVERT(varchar(7),a.create_date,23) = #{category}
+		GROUP BY a.archiveType 
+	</select>
+	
+	<select id="getCollectSourceStatics" resultType="java.util.HashMap">
+		SELECT 
+			a.collectType AS type,
+			CASE when sum(a.incount) is NULL then 0 ELSE sum(a.incount) END AS num
+		FROM
+			y_archivecollect a
+		WHERE
+			a.type = #{type}
+			AND CONVERT(varchar(7),a.create_date,23) = #{category}
+		GROUP BY a.collectType
+	</select>
+	
+	<select id="getCollectSourceOfDeptStatics" resultType="java.util.HashMap">
+		SELECT 
+			a.institutionType AS type,
+			CASE when sum(a.incount) is NULL then 0 ELSE sum(a.incount) END AS num
+		FROM
+			y_archivecollect a
+		WHERE
+			a.type = #{type}
+			AND CONVERT(varchar(7),a.create_date,23) = #{category}
+		GROUP BY a.institutionType 
+	</select>
+	
+	<select id="getAuthStaticsByUnit" resultType="java.util.HashMap">
+		SELECT 
+			detail.unitname AS name,
+			count(detail.id) AS num
+		FROM
+			y_archiveauth a,y_archiveauth_detail detail
+		WHERE
+			a.type = #{type}
+			AND a.id = detail.archiveauth_id
+			AND CONVERT(VARCHAR (4),a.create_date,23) = #{category}
+		GROUP BY detail.unitcode,detail.unitname
+	</select>
+	
+	<select id="getAuthStaticsByStoreId" resultType="java.util.HashMap">
+		SELECT 
+			store.name AS name,
+			count(detail.id) AS num
+		FROM
+			y_archiveauth a,y_archiveauth_detail detail,y_archivestore store
+		WHERE
+			a.type = #{type}
+			AND a.id = detail.archiveauth_id
+			AND detail.store_id = store.id
+			AND CONVERT(VARCHAR (4),a.create_date,23) = #{category}
+		GROUP BY detail.store_id,store.name
+	</select>
+	
+	<select id="getTransferStaticsByUnit" resultType="java.util.HashMap">
+		SELECT 
+			a.outunit AS name,
+			CASE when sum(a.outcount) is NULL then 0 ELSE sum(a.outcount) END AS num 
+		FROM
+			y_archiveaccept a
+		WHERE
+			CONVERT(varchar(4),a.create_date,23) = #{category}
+		GROUP BY a.outno,a.outunit
+	</select>
+	
+	<select id="getTransferStaticsByArchiveType" resultType="java.util.HashMap">
+		SELECT 
+			dict.label AS name,
+			sum(detail.yjcount+detail.cqcount+detail.dqcount+detail.ewcount+detail.swcount+detail.wcount) AS num 
+		FROM
+			y_archiveaccept a,y_archiveaccept_detail detail,sys_dict dict
+		WHERE
+			a.id = detail.accept_id
+			AND detail.archivetype = dict.value
+			AND dict.type = 'DAKLX'
+			AND CONVERT(varchar(4),a.create_date,23) = #{category}
+		GROUP BY detail.archivetype,dict.label
+	</select>
+	
+	<select id="getTransferStaticsByPeriod" resultType="java.util.HashMap">
+		SELECT 
+			sum(detail.yjcount) as yj,
+			sum(detail.cqcount) as cq,
+			sum(detail.dqcount) as dq,
+			sum(detail.ewcount) as ew,
+			sum(detail.swcount) as sw,
+			sum(detail.wcount) as w
+		FROM
+			y_archiveaccept a,y_archiveaccept_detail detail
+		WHERE
+			a.id = detail.accept_id
+			AND CONVERT(varchar(4),a.create_date,23) = #{category}
+	</select>
+	
+	<select id="getTransferStaticsByType" resultType="java.util.HashMap">
+		SELECT 
+			a.type AS type,
+			CASE when sum(a.outcount) is NULL then 0 ELSE sum(a.outcount) END AS num 
+		FROM
+			y_archiveaccept a
+		WHERE
+			CONVERT(varchar(4),a.create_date,23) = #{category}
+		GROUP BY a.type 
+	</select>
+	
+	<select id="getUseStatics" resultType="java.util.HashMap">
+		SELECT 
+			a.usemode AS type,
+			COUNT(detail.id) AS num 
+		FROM
+			y_archive_use a,y_archive_use_detail detail
+		WHERE
+			a.id = detail.applyid
+		GROUP BY a.usemode 
+	</select>
+	
+	<select id="getDictByLabel" resultType="Dict">
+		SELECT 
+			a.id AS id,
+			a.value,
+			a.label,
+			a.type,
+			a.description
+		FROM
+			sys_dict a 
+		WHERE
+			a.label = #{label}
+			AND a.type = #{type}
+			AND a.del_flag = '0'
+	</select>
+	
+	<select id="getUseModeStaticsByMonths" resultType="java.util.HashMap">
+		SELECT 
+			CONVERT(varchar(7),a.create_date,23) AS date,
+			COUNT(detail.id) AS num 
+		FROM
+			y_archive_use a,y_archive_use_detail detail
+		WHERE
+			a.id = detail.applyid
+			AND a.usemode = #{useMode}
+		GROUP BY CONVERT(varchar(7),a.create_date,23) 
+	</select>
+	
+	<select id="getUseModeStaticsByUnit" resultType="java.util.HashMap">
+		SELECT 
+			detail.unitname AS name,
+			COUNT(detail.id) AS num 
+		FROM
+			y_archive_use a,y_archive_use_detail detail
+		WHERE
+			a.id = detail.applyid
+			AND a.usemode = #{useMode}
+		GROUP BY detail.unitname
+	</select>
+	
+	<select id="getUseModeStaticsByArchiveType" resultType="java.util.HashMap">
+		SELECT 
+			dict.label AS name,
+			COUNT(detail.id) AS num 
+		FROM
+			y_archive_use a,y_archive_use_detail detail,sys_dict dict
+		WHERE
+			a.id = detail.applyid
+			AND detail.archivetype = dict.value
+			AND dict.type = 'DAKLX'
+			AND a.usemode = #{useMode}
+		GROUP BY detail.archivetype,dict.label
+	</select>
+	
+	<select id="getUseModeStaticsByUser" resultType="java.util.HashMap">
+		SELECT 
+			a.usertype AS type,
+			COUNT(detail.id) AS num 
+		FROM
+			y_archive_use a,y_archive_use_detail detail
+		WHERE
+			a.id = detail.applyid
+			AND a.usemode = #{useMode}
+		GROUP BY a.usertype
+	</select>
+	
+	<select id="getUsePurposeStaticsByMonths" resultType="java.util.HashMap">
+		SELECT 
+			CONVERT(varchar(7),a.create_date,23) AS date,
+			COUNT(detail.id) AS num 
+		FROM
+			y_archive_use a,y_archive_use_detail detail
+		WHERE
+			a.id = detail.applyid
+			AND a.usePurpose = #{usePurpose}
+		GROUP BY CONVERT(varchar(7),a.create_date,23) 
+	</select>
+	
+	<select id="getUsePurposeStaticsByUnit" resultType="java.util.HashMap">
+		SELECT 
+			detail.unitname AS name,
+			COUNT(detail.id) AS num 
+		FROM
+			y_archive_use a,y_archive_use_detail detail
+		WHERE
+			a.id = detail.applyid
+			AND a.usePurpose = #{usePurpose}
+		GROUP BY detail.unitname
+	</select>
+	
+	<select id="getUsePurposeStaticsByArchiveType" resultType="java.util.HashMap">
+		SELECT 
+			dict.label AS name,
+			COUNT(detail.id) AS num 
+		FROM
+			y_archive_use a,y_archive_use_detail detail,sys_dict dict
+		WHERE
+			a.id = detail.applyid
+			AND detail.archivetype = dict.value
+			AND dict.type = 'DAKLX'
+			AND a.usePurpose = #{usePurpose}
+		GROUP BY detail.archivetype,dict.label
+	</select>
+	
+	<select id="getUsePurposeStaticsByUser" resultType="java.util.HashMap">
+		SELECT 
+			a.usertype AS type,
+			COUNT(detail.id) AS num 
+		FROM
+			y_archive_use a,y_archive_use_detail detail
+		WHERE
+			a.id = detail.applyid
+			AND a.usePurpose = #{usePurpose}
+		GROUP BY a.usertype
+	</select>
+	
+	
+</mapper>

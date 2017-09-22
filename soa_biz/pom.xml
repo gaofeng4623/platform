@@ -1,0 +1,164 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.gtzn</groupId>
+    <artifactId>platform</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>soa_biz</artifactId>
+
+  <properties>
+	  <!-- SOA client version -->
+	  <xfire.version>1.2.6</xfire.version>
+	  <axis.version>1.6.3</axis.version>
+	  <cxf.version>2.3.0</cxf.version>
+	  <!-- jdbc driver setting -->
+	  <mssql.driver.version>6.1.0.jre7</mssql.driver.version>
+	  <mysql.driver.version>5.1.30</mysql.driver.version>
+	  <oracle.driver.version>10.2.0.1.0</oracle.driver.version>
+  </properties>
+
+  <dependencies>
+  	<dependency>
+  	  <groupId>com.gtzn</groupId>
+  	  <artifactId>common</artifactId>
+  	  <version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+	  <groupId>com.gtzn</groupId>
+	  <artifactId>sys_biz</artifactId>
+	  <version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+    <dependency>
+	  <groupId>com.gtzn</groupId>
+	  <artifactId>base</artifactId>
+	  <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+  	<dependency>
+	  <groupId>com.gtzn</groupId>
+	  <artifactId>soa_biz_api</artifactId>
+	  <version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+
+  <!--提供数据源驱动支持-->
+  <dependency>
+      <groupId>com.microsoft.sqlserver</groupId>
+      <artifactId>mssql-jdbc</artifactId>
+      <version>${mssql.driver.version}</version>
+  </dependency>
+  <dependency>
+	  <groupId>mysql</groupId>
+	  <artifactId>mysql-connector-java</artifactId>
+	  <version>${mysql.driver.version}</version>
+  </dependency>
+  <!--<dependency>
+	  <groupId>oracle</groupId>
+	  <artifactId>ojdbc14</artifactId>
+	  <version>${oracle.driver.version}</version>
+  </dependency>-->
+
+
+  <!--SOA的依赖库配置，目前支持CXF、Axis、XFire-->
+  <dependency><!--xFire start-->
+	  <groupId>org.codehaus.xfire</groupId>
+	  <artifactId>xfire-all</artifactId>
+	  <version>${xfire.version}</version>
+	  <exclusions>
+		  <exclusion>
+			  <artifactId>xfire-spring</artifactId>
+			  <groupId>org.codehaus.xfire</groupId>
+		  </exclusion>
+		  <exclusion>
+			  <artifactId>xfire-xmlbeans</artifactId>
+			  <groupId>org.codehaus.xfire</groupId>
+		  </exclusion>
+	  </exclusions>
+  </dependency>
+  <dependency>
+	  <groupId>commons-httpclient</groupId>
+	  <artifactId>commons-httpclient</artifactId>
+	  <version>3.0</version>
+	  <exclusions>
+		  <exclusion>
+			  <artifactId>commons-codec</artifactId>
+			  <groupId>commons-codec</groupId>
+		  </exclusion>
+		  <exclusion>
+			  <artifactId>commons-logging</artifactId>
+			  <groupId>commons-logging</groupId>
+		  </exclusion>
+		  <exclusion>
+			  <artifactId>junit</artifactId>
+			  <groupId>junit</groupId>
+		  </exclusion>
+	  </exclusions>
+  </dependency><!--xFire end-->
+
+  <dependency><!--axis start-->
+	  <groupId>org.apache.axis2</groupId>
+	  <artifactId>axis2-adb</artifactId>
+	  <version>${axis.version}</version>
+  </dependency>
+  <dependency>
+	  <groupId>org.apache.axis2</groupId>
+	  <artifactId>axis2-codegen</artifactId>
+	  <version>${axis.version}</version>
+  </dependency>
+  <dependency>
+	  <groupId>org.apache.axis2</groupId>
+	  <artifactId>axis2-kernel</artifactId>
+	  <version>${axis.version}</version>
+  </dependency>
+  <dependency>
+	  <groupId>org.apache.axis2</groupId>
+	  <artifactId>axis2-transport-http</artifactId>
+	  <version>${axis.version}</version>
+  </dependency>
+  <dependency>
+	  <groupId>org.apache.axis2</groupId>
+	  <artifactId>axis2-transport-local</artifactId>
+	  <version>${axis.version}</version>
+  </dependency>
+  <dependency>
+	  <groupId>org.apache.ws.commons.schema</groupId>
+	  <artifactId>XmlSchema</artifactId>
+	  <version>1.4.7</version>
+  </dependency>
+  <dependency>
+	  <groupId>wsdl4j</groupId>
+	  <artifactId>wsdl4j</artifactId>
+	  <version>1.6.2</version>
+  </dependency>
+  <dependency>
+	  <groupId>org.apache.neethi</groupId>
+	  <artifactId>neethi</artifactId>
+	  <version>3.0.2</version>
+  </dependency>
+  <dependency>
+	  <groupId>org.apache.httpcomponents</groupId>
+	  <artifactId>httpcore</artifactId>
+	  <version>4.0</version>
+  </dependency>
+  <dependency>
+	  <groupId>org.apache.ws.commons.axiom</groupId>
+	  <artifactId>axiom-api</artifactId>
+	  <version>1.2.14</version>
+  </dependency>
+  <dependency>
+	  <groupId>org.apache.ws.commons.axiom</groupId>
+	  <artifactId>axiom-impl</artifactId>
+	  <version>1.2.14</version>
+  </dependency><!--axis end-->
+
+  <!--<dependency>&lt;!&ndash;CXF start&ndash;&gt;
+	  <groupId>org.apache.cxf</groupId>
+	  <artifactId>cxf-rt-frontend-jaxws</artifactId>
+	  <version>3.1.11</version>
+  </dependency>
+  <dependency>
+	  <groupId>org.apache.cxf</groupId>
+	  <artifactId>cxf-rt-transports-http</artifactId>
+	  <version>3.1.11</version>
+  </dependency>&lt;!&ndash;CXF end&ndash;&gt;-->
+  </dependencies>
+</project>

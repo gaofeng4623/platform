@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.digital.dao.DocUseDao">
+   
+  	<!--  利用总数 -->
+    <select id="findUseCount" resultType="int">
+    	SELECT
+			 COUNT(b.id) as count
+		FROM
+			y_archive_use a,
+			y_archive_use_detail b
+		WHERE
+			a.id = b.applyid	
+    </select>
+    <!--  借阅总数 -->
+     <select id="findBorrowCount" resultType="int">
+    	SELECT
+			 COUNT(b.id) as count
+		FROM
+			y_borrowapply a,
+			y_borrowapply_detail b
+		WHERE
+			a.id = b.apply_id
+    </select>
+    <select id="findUseCountByMonth" resultType="HashMap">
+    	SELECT
+			CONVERT (CHAR(7), a.create_date, 120) as month,
+			CONVERT (VARCHAR, COUNT(1)) as count
+		FROM
+			y_archive_use a,
+			y_archive_use_detail b
+		WHERE
+			a.id = b.applyid
+		AND CONVERT (CHAR(7), a.create_date, 120) >= CONVERT (
+			CHAR (7),
+			dateadd(MONTH ,- 12, getdate()),
+			120
+		)
+		GROUP BY
+			CONVERT (CHAR(7), a.create_date, 120)
+    </select>
+     <select id="findBorrowCountByMonth" resultType="HashMap">
+    	SELECT
+			CONVERT (CHAR(7), a.create_date, 120) as month,
+			CONVERT (VARCHAR, COUNT(1)) as count
+		FROM
+			y_borrowapply a,
+			y_borrowapply_detail b
+		WHERE
+			a.id = b.apply_id
+		AND CONVERT (CHAR(7), a.create_date, 120) >= CONVERT (
+			CHAR (7),
+			dateadd(MONTH ,- 12, getdate()),
+			120
+		)
+		GROUP BY
+			CONVERT (CHAR(7), a.create_date, 120)
+    </select>
+    <!--   按年统计利用量 -->
+    <select id="findUseCountByYear" resultType="HashMap">
+    	SELECT
+			CONVERT (CHAR(4), a.create_date, 120) as year,
+			CONVERT (VARCHAR, COUNT(1)) as count
+		FROM
+			y_archive_use a,
+			y_archive_use_detail b
+		WHERE
+			a.id = b.applyid		
+		GROUP BY
+			CONVERT (CHAR(4), a.create_date, 120)
+		ORDER BY year asc
+    </select>
+    <!--   按年统计借阅量 -->
+    <select id="findBorrowCountByYear" resultType="HashMap">
+    	SELECT
+			CONVERT (CHAR(4), a.create_date, 120) as year,
+			CONVERT (VARCHAR, COUNT(1)) as count
+		FROM
+			y_borrowapply a,
+			y_borrowapply_detail b
+		WHERE
+			a.id = b.apply_id
+		GROUP BY
+			CONVERT (CHAR(4), a.create_date, 120)
+		ORDER BY year asc
+    </select>
+    <!-- 利用，单位，个人利用数量统计 -->
+    <select id="findUseCountByMonthUserType" resultType="HashMap">
+    	SELECT
+			CONVERT (CHAR(7), a.create_date, 120) as month,
+			a.usertype,
+			CONVERT (VARCHAR, COUNT(1)) as count
+		FROM
+			y_archive_use a,
+			y_archive_use_detail b
+		WHERE
+			a.id = b.applyid
+		AND CONVERT (CHAR(7), a.create_date, 120) >= CONVERT (
+			CHAR (7),
+			dateadd(MONTH ,- 12, getdate()),
+			120
+		)
+		GROUP BY
+			CONVERT (CHAR(7), a.create_date, 120),	a.usertype
+    </select>
+    
+    <!--  借阅，实体，电子档案数量统计 -->
+    <select id="findBorrowCountByMonthApplyType" resultType="HashMap">
+    	SELECT
+			CONVERT (CHAR(7), a.create_date, 120) as month,
+			CONVERT (VARCHAR, a.applytype) as applytype,
+			CONVERT (VARCHAR, COUNT(1)) as count
+		FROM
+			y_borrowapply a,
+			y_borrowapply_detail b
+		WHERE
+			a.id = b.apply_id
+		AND CONVERT (CHAR(7), a.create_date, 120) >= CONVERT (
+			CHAR (7),
+			dateadd(MONTH ,- 12, getdate()),
+			120
+		)
+		GROUP BY
+			CONVERT (CHAR(7), a.create_date, 120), a.applytype
+    </select>
+    <!--  档案利用目的分组统计 -->
+    <select id="findUseCountByUsepurpose" resultType="HashMap">
+		SELECT
+			a.usepurpose,
+			CONVERT (VARCHAR, COUNT(1)) AS count
+		FROM
+			y_archive_use a,
+			y_archive_use_detail b
+		GROUP BY
+			a.usepurpose
+    </select>
+    <!--  档案借阅目的分组统计 -->
+    <select id="findBorrowCountByUsepurpose" resultType="HashMap">
+		SELECT
+			a.md AS usepurpose,
+			CONVERT (VARCHAR, COUNT(1)) AS count
+		FROM
+			y_borrowapply a,
+			y_borrowapply_detail b
+		WHERE
+			a.id = b.apply_id
+		GROUP BY
+			a.md
+    </select>
+    <select id="findDict" resultType="Dict">
+    	SELECT
+			value,
+			label
+		FROM
+			sys_dict
+		WHERE
+			type = #{type}
+		ORDER BY
+			sort
+    </select>
+	<select id="findUseUnitCount" resultType="HashMap">
+		SELECT
+			unitname,
+			CONVERT (VARCHAR, COUNT(1)) AS count
+		FROM
+			y_archive_use_detail
+		GROUP BY
+			unitname
+		ORDER BY
+			COUNT DESC
+	</select>
+	<select id="findBorrowUnitCount" resultType="HashMap">
+		SELECT
+			unitname,
+			CONVERT (VARCHAR, COUNT(1)) AS count
+		FROM
+			y_borrowapply_detail
+		GROUP BY
+			unitname
+		ORDER BY
+			COUNT DESC
+	</select>
+	<!-- 使用利用登记身份证号查询年龄范围 -->
+	<select id="findUseAgeRange" resultType="HashMap">
+		SELECT
+			COUNT (
+				CASE
+				WHEN DATEDIFF(
+					YEAR,
+					CONVERT (
+						datetime,
+						SUBSTRING (certcode, 7, 8)
+					),
+					GETDATE()
+				) BETWEEN 0
+				AND 20 THEN
+					1
+				END
+			) AS n20,
+			COUNT (
+				CASE
+				WHEN DATEDIFF(
+					YEAR,
+					CONVERT (
+						datetime,
+						SUBSTRING (certcode, 7, 8)
+					),
+					GETDATE()
+				) BETWEEN 20
+				AND 30 THEN
+					1
+				END
+			) AS n2030,
+			COUNT (
+				CASE
+				WHEN DATEDIFF(
+					YEAR,
+					CONVERT (
+						datetime,
+						SUBSTRING (certcode, 7, 8)
+					),
+					GETDATE()
+				) BETWEEN 30
+				AND 40 THEN
+					1
+				END
+			) AS n3040,
+			COUNT (
+				CASE
+				WHEN DATEDIFF(
+					YEAR,
+					CONVERT (
+						datetime,
+						SUBSTRING (certcode, 7, 8)
+					),
+					GETDATE()
+				) BETWEEN 40
+				AND 50 THEN
+					1
+				END
+			) AS n4050,
+			COUNT (
+				CASE
+				WHEN DATEDIFF(
+					YEAR,
+					CONVERT (
+						datetime,
+						SUBSTRING (certcode, 7, 8)
+					),
+					GETDATE()
+				) BETWEEN 50
+				AND 60 THEN
+					1
+				END
+			) AS n5060,
+			COUNT (
+				CASE
+				WHEN DATEDIFF(
+					YEAR,
+					CONVERT (
+						datetime,
+						SUBSTRING (certcode, 7, 8)
+					),
+					GETDATE()
+				) BETWEEN 60
+				AND 70 THEN
+					1
+				END
+			) AS n6070,
+			COUNT (
+				CASE
+				WHEN DATEDIFF(
+					YEAR,
+					CONVERT (
+						datetime,
+						SUBSTRING (certcode, 7, 8)
+					),
+					GETDATE()
+				) BETWEEN 70
+				AND 150 THEN
+					1
+				END
+			) AS n70
+		FROM
+			y_archive_use
+	</select>
+	
+	
+	
+	<select id="findUseCountByMonthUserTypeEq" resultType="HashMap">
+    	SELECT
+			CONVERT (CHAR(10), a.create_date, 120) as month,
+			CONVERT (VARCHAR, COUNT(1)) as count
+		FROM
+			y_archive_use a,
+			y_archive_use_detail b
+		WHERE
+			a.id = b.applyid
+		AND CONVERT (CHAR(7), a.create_date, 120) = #{month}
+		AND a.usertype = #{usertype}
+		GROUP BY
+			CONVERT (CHAR(10), a.create_date, 120)
+    </select>
+    <select id="findUseCountByClassEq" resultType="HashMap">
+	   SELECT
+			CONVERT (VARCHAR, COUNT(1)) as count,
+			d.name
+		FROM
+			y_archive_use a,
+			y_archive_use_detail b,
+			y_archivestore c,
+			y_archiveclass d
+		WHERE
+			a.id = b.applyid
+		AND b.storeid = c.id
+		AND c.class_id = d.id
+		AND CONVERT (CHAR(7), a.create_date, 120) = #{month}
+		AND a.usertype = #{usertype}
+		GROUP BY d.name
+		ORDER BY COUNT
+    </select>
+    
+    <select id="findBorrowCountByMonthApplyTypeEq" resultType="HashMap">
+    	SELECT
+			CONVERT (CHAR(10), a.create_date, 120) AS month,
+			CONVERT (VARCHAR, COUNT(1)) AS count
+		FROM
+			y_borrowapply a,
+			y_borrowapply_detail b
+		WHERE
+			a.id = b.apply_id
+		AND CONVERT (CHAR(7), a.create_date, 120) = #{ month }
+		AND a.applytype = #{ applytype }
+		GROUP BY
+			CONVERT (CHAR(10), a.create_date, 120)
+    </select>
+    <select id="findBorrowCountByClassEq" resultType="HashMap">
+	    SELECT
+			CONVERT (VARCHAR, COUNT(1)) as count,
+			d.name
+		FROM
+			y_borrowapply a,
+			y_borrowapply_detail b,
+			y_archivestore c,
+			y_archiveclass d
+		WHERE
+			a.id = b.apply_id
+		AND b.store_id = c.id
+		AND c.class_id = d.id
+		AND CONVERT (CHAR(7), a.create_date, 120) = #{month}
+		AND a.applytype = #{applytype}
+		GROUP BY d.name
+		ORDER BY count
+    </select>
+</mapper>

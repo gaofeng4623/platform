@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.sys.dao.ScheduleJobDao">
+    
+	<sql id="scheduleJobColumns">
+		a.id AS "id",
+		a.jobname AS "jobName",
+		a.jobgroup AS "jobGroup",
+		a.jobstatus AS "jobStatus",
+		a.cronexpression AS "cronExpression",
+		a.description AS "description",
+		a.beanclass AS "beanClass",
+		a.isconcurrent AS "isConcurrent",
+		a.springid AS "springId",
+		a.methodname AS "methodName",
+		a.jobType AS "jobType",
+		a.fenz AS "fenz",
+	 	a.xiaos AS "xiaos",
+		a.tians AS "tians",
+		a.zhous AS "zhous",
+		a.yues AS "yues",
+		a.cronDesc AS "cronDesc"
+	</sql>
+	
+	<sql id="scheduleJobJoins">
+	</sql>
+    
+	<select id="get" resultType="ScheduleJob">
+		SELECT 
+			<include refid="scheduleJobColumns"/>
+		FROM s_schedule_job a
+		<include refid="scheduleJobJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findPage" resultType="ScheduleJob">
+		SELECT 
+			<include refid="scheduleJobColumns"/>
+		FROM 
+			s_schedule_job a
+		<where>
+			
+			<if test="jobName != null and jobName != ''">
+				AND jobname = #{jobName}
+			</if>
+			<if test="jobStatus != null and jobStatus != ''">
+				AND jobstatus = #{jobStatus}
+			</if>
+			<if test="isConcurrent != null and isConcurrent != ''">
+				AND isconcurrent = #{isConcurrent}
+			</if>
+			<if test="springId != null and springId != ''">
+				AND springid = #{springId}
+			</if>
+		</where>
+		ORDER BY a.jobname DESC
+		<include refid="common.mysql_page" />
+	</select>
+	<select id="findCount" resultType="int">
+		SELECT 
+			count(a.id)
+		FROM s_schedule_job a
+		<include refid="scheduleJobJoins"/>
+		<where>
+			
+			<if test="jobName != null and jobName != ''">
+				AND a.jobname = #{jobName}
+			</if>
+			<if test="jobStatus != null and jobStatus != ''">
+				AND a.jobstatus = #{jobStatus}
+			</if>
+			<if test="isConcurrent != null and isConcurrent != ''">
+				AND a.isconcurrent = #{isConcurrent}
+			</if>
+			<if test="springId != null and springId != ''">
+				AND a.springid = #{springId}
+			</if>
+		</where>
+	</select>
+	
+	<select id="findAllList" resultType="ScheduleJob">
+		SELECT 
+			<include refid="scheduleJobColumns"/>
+		FROM s_schedule_job a
+		<include refid="scheduleJobJoins"/>
+		<where>
+			
+			<if test="jobName != null and jobName != ''">
+				AND a.jobname = #{jobName}
+			</if>
+			<if test="jobStatus != null and jobStatus != ''">
+				AND a.jobstatus = #{jobStatus}
+			</if>
+			<if test="isConcurrent != null and isConcurrent != ''">
+				AND a.isconcurrent = #{isConcurrent}
+			</if>
+			<if test="springId != null and springId != ''">
+				AND a.springid = #{springId}
+			</if>
+		</where>		
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO s_schedule_job(
+			id,
+			jobname,
+			jobgroup,
+			jobstatus,
+			cronexpression,
+			description,
+			beanclass,
+			isconcurrent,
+			springid,
+			methodname,
+			jobType,
+			fenz,
+		 	xiaos,
+			tians,
+			zhous,
+			yues,
+			cronDesc
+		) VALUES (
+			#{id},
+			#{jobName},
+			#{jobGroup},
+			#{jobStatus},
+			#{cronExpression},
+			#{description},
+			#{beanClass},
+			#{isConcurrent},
+			#{springId},
+			#{methodName},
+			#{jobType},
+			#{fenz},
+		 	#{xiaos},
+			#{tians},
+			#{zhous},
+			#{yues},
+			#{cronDesc}
+		)
+	</insert>
+
+	<insert id="insertSelective">
+		INSERT INTO s_schedule_job
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+				id,
+			</if>
+			<if test="jobName != null and jobName != ''">
+				jobname,
+			</if>
+			<if test="jobGroup != null and jobGroup != ''">
+				jobgroup,
+			</if>
+			<if test="jobStatus != null and jobStatus != ''">
+				jobstatus,
+			</if>
+			<if test="cronExpression != null and cronExpression != ''">
+				cronexpression,
+			</if>
+			<if test="description != null and description != ''">
+				description,
+			</if>
+			<if test="beanClass != null and beanClass != ''">
+				beanclass,
+			</if>
+			<if test="isConcurrent != null and isConcurrent != ''">
+				isconcurrent,
+			</if>
+			<if test="springId != null and springId != ''">
+				springid,
+			</if>
+			<if test="methodName != null and methodName != ''">
+				methodname,
+			</if>
+			<if test="jobType != null and jobType != ''">
+				jobtype,
+			</if>
+			<if test="fenz != null and fenz != ''">
+				fenz,
+			</if>
+			<if test="xiaos != null and xiaos != ''">
+				xiaos,
+			</if>
+			<if test="tians != null and tians != ''">
+				tians,
+			</if>
+			<if test="zhous != null and zhous != ''">
+				zhous,
+			</if>
+			<if test="yues != null and yues != ''">
+				yues,
+			</if>
+			<if test="cronDesc != null and cronDesc != ''">
+				crondesc,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="jobName != null and jobName != ''">
+				#{jobName,jdbcType=VARCHAR},
+			</if>
+			<if test="jobGroup != null and jobGroup != ''">
+				#{jobGroup,jdbcType=VARCHAR},
+			</if>
+			<if test="jobStatus != null and jobStatus != ''">
+				#{jobStatus,jdbcType=VARCHAR},
+			</if>
+			<if test="cronExpression != null and cronExpression != ''">
+				#{cronExpression,jdbcType=VARCHAR},
+			</if>
+			<if test="description != null and description != ''">
+				#{description,jdbcType=VARCHAR},
+			</if>
+			<if test="beanClass != null and beanClass != ''">
+				#{beanClass,jdbcType=VARCHAR},
+			</if>
+			<if test="isConcurrent != null and isConcurrent != ''">
+				#{isConcurrent,jdbcType=VARCHAR},
+			</if>
+			<if test="springId != null and springId != ''">
+				#{springId,jdbcType=VARCHAR},
+			</if>
+			<if test="methodName != null and methodName != ''">
+				#{methodName,jdbcType=VARCHAR},
+			</if>
+			<if test="jobType != null and jobType != ''">
+				#{jobType,jdbcType=VARCHAR},
+			</if>
+			<if test="fenz != null and fenz != ''">
+				#{fenz,jdbcType=INTEGER},
+			</if>
+			<if test="xiaos != null and xiaos != ''">
+				#{xiaos,jdbcType=INTEGER},
+			</if>
+			<if test="tians != null and tians != ''">
+				#{tians,jdbcType=INTEGER},
+			</if>
+			<if test="zhous != null and zhous != ''">
+				#{zhous,jdbcType=INTEGER},
+			</if>
+			<if test="yues != null and yues != ''">
+				#{yues,jdbcType=INTEGER},
+			</if>
+			<if test="cronDesc != null and cronDesc != ''">
+				#{cronDesc,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	
+	<update id="update">
+		UPDATE s_schedule_job SET 	
+			jobname = #{jobName},
+			jobgroup = #{jobGroup},
+			jobstatus = #{jobStatus},
+			cronexpression = #{cronExpression},
+			description = #{description},
+			beanclass = #{beanClass},
+			isconcurrent = #{isConcurrent},
+			springid = #{springId},
+			methodname = #{methodName},
+			jobType=#{jobType},
+			fenz=#{fenz},
+		 	xiaos=#{xiaos},
+			tians=#{tians},
+			zhous=#{zhous},
+			yues=#{yues},
+			cronDesc=#{cronDesc}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateSelective" parameterType="ScheduleJob">
+		UPDATE s_schedule_job
+		<set>
+			<if test="jobName != null and jobName != ''">
+				jobname = #{jobName,jdbcType=VARCHAR},
+			</if>
+			<if test="jobGroup != null and jobGroup != ''">
+				jobgroup = #{jobGroup,jdbcType=VARCHAR},
+			</if>
+			<if test="jobStatus != null and jobStatus != ''">
+				jobstatus = #{jobStatus,jdbcType=VARCHAR},
+			</if>
+			<if test="cronExpression != null and cronExpression != ''">
+				cronexpression = #{cronExpression,jdbcType=VARCHAR},
+			</if>
+			<if test="description != null and description != ''">
+				description = #{description,jdbcType=VARCHAR},
+			</if>
+			<if test="beanClass != null and beanClass != ''">
+				beanclass = #{beanClass,jdbcType=VARCHAR},
+			</if>
+			<if test="isConcurrent != null and isConcurrent != ''">
+				isconcurrent = #{isConcurrent,jdbcType=VARCHAR},
+			</if>
+			<if test="springId != null and springId != ''">
+				springid = #{springId,jdbcType=VARCHAR},
+			</if>
+			<if test="methodName != null and methodName != ''">
+				methodname = #{methodName,jdbcType=VARCHAR},
+			</if>
+			<if test="jobType != null and jobType != ''">
+				jobtype = #{jobType,jdbcType=VARCHAR},
+			</if>
+			<if test="fenz != null and fenz != ''">
+				fenz = #{fenz,jdbcType=INTEGER},
+			</if>
+			<if test="xiaos != null and xiaos != ''">
+				xiaos = #{xiaos,jdbcType=INTEGER},
+			</if>
+			<if test="tians != null and tians != ''">
+				tians = #{tians,jdbcType=INTEGER},
+			</if>
+			<if test="zhous != null and zhous != ''">
+				zhous = #{zhous,jdbcType=INTEGER},
+			</if>
+			<if test="yues != null and yues != ''">
+				yues = #{yues,jdbcType=INTEGER},
+			</if>
+			<if test="cronDesc != null and cronDesc != ''">
+				crondesc = #{cronDesc,jdbcType=VARCHAR},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM s_schedule_job
+		WHERE id = #{id}
+	</update>
+	<select id="existJobName" resultType="ScheduleJob" parameterType="java.lang.String">
+		select 
+		<include refid="scheduleJobColumns"/>
+		FROM s_schedule_job a
+		<include refid="scheduleJobJoins"/>
+		<where>
+			
+			<if test="name != null and name != ''">
+				AND a.jobname = #{name}
+			</if>
+		</where>
+	</select>
+</mapper>

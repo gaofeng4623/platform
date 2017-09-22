@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.digital.dao.WorkProcessDao">
+    
+	<sql id="yWorklistColumns">
+		a.id AS "id",
+		a.apply_id AS "applyId",
+		a.flow_id AS "flowId",
+		a.step_id AS "stepId",
+		a.state AS "state",
+		a.user_id AS "user",
+		a.approve_date AS "approveDate",
+		a.memo AS "memo",
+		a.apply_type AS "applyType",
+		a.ixh AS "ixh",
+		a.del_flag AS "delFlag",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.parent_id as "parentId",
+		a.current_flag as "currentFlag",
+		u.name as "approveName",
+		u2.name as "applyName"
+	</sql>
+	
+	<sql id="worklistParam">
+		<if test="user != null and user != ''">
+				and a.user_id = #{user}
+			</if>
+			
+			<if test="applyType != null and applyType != ''">
+				and a.apply_type = #{applyType}
+			</if>
+			<if test="applyId != null and applyId != ''">
+				and apply_id = #{applyId}
+			</if>
+			<if test="state != null and state != ''">
+				and a.state = #{state}
+			</if>
+			
+			<if test="stateList != null and stateList.size() > 0">
+				and a.state in
+				<foreach item="item" index="index"  collection="stateList" open="(" separator="," close=")">  
+			      #{item}  
+			     </foreach>
+			</if>
+			
+			 <if test="applyTypeList != null and applyTypeList.size() > 0">
+		     and a.apply_type in
+				<foreach item="item" index="index"  collection="applyTypeList" open="(" separator="," close=")">  
+			      #{item}  
+			     </foreach> 
+		     </if>
+			
+			<if test="currentFlag != null and currentFlag != ''">
+				and a.current_flag = #{currentFlag}
+			</if>
+	</sql>
+	<sql id="yWorklistJoins">
+		 LEFT JOIN sys_user u ON u.id = a.user_id
+		 left join y_archive_use y on a.apply_id=y.id 
+			left join sys_user u2 on y.create_by=u2.id 
+	</sql>
+    
+	<select id="get" resultType="YWorklist">
+		SELECT 
+			<include refid="yWorklistColumns"/>
+		FROM y_worklist a
+		<include refid="yWorklistJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findPage" resultType="YWorklist">
+		SELECT 
+			<include refid="yWorklistColumns"/>
+		FROM 
+		(SELECT TOP   ${pager.currentRows} * FROM 
+		(SELECT TOP  ${pager.currentNum} * FROM y_worklist 
+		<where>
+			del_flag = #{DEL_FLAG_NORMAL}
+			<if test="user != null and user != ''">
+				and user_id = #{user}
+			</if>
+			<if test="applyType != null and applyType != ''">
+				and apply_type = #{applyType}
+			</if>
+			<if test="applyId != null and applyId != ''">
+				and apply_id = #{applyId}
+			</if>
+			<if test="state != null and state != ''">
+				and state = #{state}
+			</if>
+		</where>
+		ORDER BY update_date DESC)f
+			ORDER BY  f.update_date ASC
+			) a
+		ORDER BY a.update_date DESC
+	</select>
+	<select id="findCount" resultType="int">
+		SELECT 
+			count(a.id)
+		FROM y_worklist a
+		<include refid="yWorklistJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<include refid="worklistParam"/>
+		</where>
+	</select>
+	
+	<select id="findAllList" resultType="YWorklist">
+		SELECT 
+			<include refid="yWorklistColumns"/>
+		FROM y_worklist a
+		<include refid="yWorklistJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<include refid="worklistParam"/>
+		</where>
+		order by a.create_date desc
+	</select>
+	
+	
+	<select id="findDoneList" resultType="YWorklist">
+		select * from (
+ 			SELECT max(a.id) AS "id",a.apply_id AS "applyId",a.apply_type AS "applyType" ,max(a.state) AS "state", step_id AS "stepId",
+			 max(a.user_id) AS "user", max(a.approve_date) AS "approveDate",max( a.memo) AS "memo", 
+			max(a.ixh) AS "ixh", max(a.create_date) AS "createDate", 
+			max(a.parent_id) as "parentId",  max(u.name) as "approveName", max(u2.name) AS "applyName" 
+			  FROM y_worklist a LEFT JOIN sys_user u ON u.id = a.user_id
+			   left join y_archive_use y on a.apply_id=y.id 
+			left join sys_user u2 on y.create_by=u2.id
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			
+			<include refid="worklistParam"/>
+		</where>
+		 group by apply_Id,apply_type, step_id) t  
+		order by t.approvedate desc
+	</select>
+	
+	<select id="findDoneCount" resultType="int">
+		select count(*) from (
+ 			SELECT a.apply_id AS "applyId",a.apply_type AS "applyType" 
+			  FROM y_worklist a LEFT JOIN sys_user u ON u.id = a.user_id
+			   left join y_archive_use y on a.apply_id=y.id 
+			left join sys_user u2 on y.create_by=u2.id
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<include refid="worklistParam"/>
+		</where>
+		group by apply_Id,apply_type ) t  
+	</select>
+	
+	
+	
+	
+	
+</mapper>

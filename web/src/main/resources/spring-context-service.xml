@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans          
+        http://www.springframework.org/schema/beans/spring-beans.xsd          
+        http://code.alibabatech.com/schema/dubbo          
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+        
+	<dubbo:reference id="dictService" interface="com.gtzn.modules.sys.service.DictService" />
+	<dubbo:reference id="logService" interface="com.gtzn.modules.sys.service.LogService" />
+	<dubbo:reference id="officeService" interface="com.gtzn.modules.sys.service.OfficeService" />
+	<dubbo:reference id="systemService" interface="com.gtzn.modules.sys.service.SystemService" />
+	<dubbo:reference id="exampleService" interface="com.gtzn.modules.sys.service.ExampleService" />
+	<!--<dubbo:reference id="deliverBindService" interface="com.gtzn.modules.base.service.DeliverBindService" />-->
+	<dubbo:reference id="doorService"  interface="com.gtzn.modules.base.service.DoorService"/>
+	
+	
+	<dubbo:reference id="genSchemeService" interface="com.gtzn.modules.gen.service.GenSchemeService" />
+	<dubbo:reference id="genTableService" interface="com.gtzn.modules.gen.service.GenTableService" />
+	<dubbo:reference id="genTemplateService" interface="com.gtzn.modules.gen.service.GenTemplateService" />
+</beans>  

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.digital.dao.DataCollectionDao">
+    
+    <sql id="collectionColumns">
+    	c.ID AS "id",
+    	c.QZMC AS "genName",
+    	c.QZH AS "recordNum",
+    	c.MLH AS "catalog",
+    	c.AJH AS "filesID",
+    	c.DH AS "docNum",
+    	c.ND AS "yearN",
+    	c.QZSJ AS "enthesis",
+    	c.BGQX AS "retainDate",
+    	c.WJJS AS "fileNum",
+    	c.ZTC AS "subject",
+    	c.TM AS "booksTitle",
+    	<!-- c.MJ AS ,
+    	c.ZTSL AS ,
+    	c.DAGDM AS ,
+    	c.FZ AS ,
+    	c.KFPC AS ,
+    	c.KFWZ AS ,
+    	c.DZBQ AS ,
+    	c.JH AS ,
+    	c.SZYH AS ,
+    	c.WJBH AS ,
+    	c.ZRZ AS ,
+    	c.CWSJ AS ,
+    	c.FJ AS , -->
+    	c.UPDATE_DATE AS "updateDate"
+    </sql>
+    
+    <sql id="yDataCollectionColumns">
+		a.ID AS "aid",
+		a.AJTM AS "autograph",
+		a.ZTC AS subject1,
+		a.QZMC AS "genName1",
+		a.BGQX AS "retainDate1",
+		a.QZSJ AS "enthesis1",
+		a.WJJS AS "fileNum1",
+		a.DH AS "docNum1",
+		a.MLH AS "catalog1",
+		a.AJH AS "filesID1",
+		a.ND AS "docNum1",
+		a.QZH AS "recordNum1"
+	</sql>
+  		
+  	<sql id="fileCollectionColumns">
+  		f.ID AS "fid",
+		f.FILENAME AS "fileName",
+		f.FILETITLE AS "fileTitle",
+		f.FILEPATH AS "filePath",
+		f.FILETYPE AS "fileType",
+		f.FILESIZE AS "fileSize"
+	</sql>
+	
+	<sql id="fileTableName">
+		${fTableName} f
+	</sql>
+	
+	<sql id="cTableName">
+		${cTableName} c
+	</sql>
+	
+	<sql id="aTableName">
+		${aTableName} a
+	</sql>
+	
+	<select id="getFile" resultType="YDataCollection" parameterType="java.lang.String" statementType="STATEMENT">
+		SELECT
+			<include refid="fileCollectionColumns"/>
+		FROM 
+			<include refid="fileTableName"/>
+		WHERE f.RECID = ${aid}
+	</select>
+	
+    <select id="get" resultType="YDataCollection" parameterType="java.lang.String" statementType="STATEMENT">
+		SELECT
+			<include refid="yDataCollectionColumns"/>
+		FROM 
+			<include refid="aTableName"/>
+		WHERE a.PARENTID = ${aid}
+	</select>
+	
+	
+	<select id="findTopN" resultType="YDataCollection" parameterType="java.lang.String" statementType="STATEMENT">
+		SELECT TOP ${topN}
+			<include refid="collectionColumns"/> ,
+			<include refid="yDataCollectionColumns"/> ,
+ 			<include refid="fileCollectionColumns"/> 
+		FROM 
+		<include refid="cTableName"/>
+		
+		INNER JOIN
+		<include refid="aTableName"/>
+		ON a.PARENTID = c.ID
+		
+		INNER JOIN 
+		<include refid="fileTableName"/>
+		ON f.RECID=a.ID
+		
+		ORDER BY c.UPDATE_DATE DESC
+	</select>
+	
+	<select id="findCount" resultType="int" parameterType="java.lang.String" statementType="STATEMENT">
+		SELECT 
+			count(c.id)
+		FROM 
+			<include refid="cTableName"/>
+	</select>
+	
+	<select id="getPage" resultType="YDataCollection" parameterType="java.lang.Object" statementType="STATEMENT">
+		SELECT TOP ${currentRows} 
+		<include refid="collectionColumns"/> 
+		 FROM 
+			<include refid="cTableName"/>
+			
+			WHERE c.id NOT IN (
+ 		 		SELECT TOP ${currentNum} c.id 
+ 		 		FROM 
+					<include refid="cTableName"/>
+ 		 		 	ORDER BY c.UPDATE_DATE DESC
+			)  
+	
+			<if test="subject != null and subject != ''">
+				AND c.ZTC LIKE 
+					'%${subject}%'
+			</if>
+			<if test="genName != null and genName != ''">
+				AND c.QZMC LIKE 
+					'%${genName}%'
+			</if>
+		ORDER BY c.UPDATE_DATE DESC
+	</select>
+	
+</mapper>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.base.dao.DeliverBindDao">
+    <!--     <cache type="org.mybatis.caches.redis.RedisCache" /> -->
+    <select id="findPage" resultType="DeliverBind" databaseId="mysql">
+        select
+        d.id AS id,
+        d.branchId,
+        o.name AS "office.name",
+        d.workMachIp,
+        d.deliverMachIp
+        from deliver_bind d,sys_office o
+        <where>
+            <!--<if test="office.id != null and office.id != ''">-->
+            <!--AND d.branchId = #{office.id}-->
+            <!--</if>-->
+            <if test="workMachIp != null and workMachIp != ''">
+                AND d.workMachIp LIKE CONCAT('%', #{workMachIp}, '%')
+            </if>
+            <if test="deliverMachIp != null and deliverMachIp != ''">
+                AND d.deliverMachIp LIKE CONCAT('%', #{deliverMachIp}, '%')
+            </if>
+            <!-- 数据范围过滤 -->
+            ${sqlMap.dsf}
+            AND d.branchId = o.code
+        </where>
+        <include refid="common.mysql_page"/>
+    </select>
+    <select id="findCount" resultType="int" databaseId="mysql">
+        select
+        count(d.id)
+        from deliver_bind d,sys_office o
+        <where>
+            <!--<if test="office.id != null and office.id != ''">-->
+            <!--AND d.branchId = #{office.id}-->
+            <!--</if>-->
+            <if test="workMachIp != null and workMachIp != ''">
+                AND d.workMachIp LIKE CONCAT('%', #{workMachIp}, '%')
+            </if>
+            <if test="deliverMachIp != null and deliverMachIp != ''">
+                AND d.deliverMachIp LIKE CONCAT('%', #{deliverMachIp}, '%')
+            </if>
+            <!-- 数据范围过滤 -->
+            ${sqlMap.dsf}
+            AND d.branchId = o.code
+        </where>
+    </select>
+
+    <!-- 插入 -->
+    <insert id="insert">
+        INSERT INTO deliver_bind
+        (id,
+         branchId,
+         workMachIp,
+         deliverMachIp)
+        VALUES (
+            #{id},
+            #{branchId},
+            #{workMachIp},
+            #{deliverMachIp});
+    </insert>
+
+    <!-- 更新 -->
+    <update id="update">
+        UPDATE deliver_bind
+        SET
+            workMachIp    = #{workMachIp},
+            deliverMachIp = #{deliverMachIp}
+        WHERE id = #{id};
+    </update>
+
+    <!-- 删除 -->
+    <update id="delete">
+        DELETE
+        FROM deliver_bind
+        WHERE id = #{id};
+    </update>
+
+    <!-- 根据id获取配置信息 -->
+    <select id="get" resultType="DeliverBind">
+        SELECT
+            d.id       AS id,
+            d.branchId AS "office.id",
+            d.workMachIp,
+            d.deliverMachIp
+        FROM deliver_bind d
+        WHERE d.id = #{id}
+    </select>
+
+    <!-- 获取该workMachIp的数量-->
+    <select id="findCountByWorkIp" resultType="int">
+        SELECT COUNT(1)
+        FROM deliver_bind d
+        WHERE d.workMachIp = #{workMachIp}
+        <if test="id != null and id != ''">
+            AND d.id != #{id}
+        </if>
+        AND d.branchId = #{branchId}
+    </select>
+    <!-- 获取该deliverMachIp的数量 -->
+    <select id="findCountByDeliverIp" resultType="int">
+        SELECT COUNT(1)
+        FROM deliver_bind d
+        WHERE d.deliverMachIp = #{deliverMachIp}
+        <if test="id != null and id != ''">
+            AND d.id != #{id}
+        </if>
+              AND d.branchId = #{branchId}
+    </select>
+</mapper>

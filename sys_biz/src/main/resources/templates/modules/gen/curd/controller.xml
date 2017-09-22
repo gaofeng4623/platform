@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>controller</name>
+	<filePath>src/main/java/${packageName}/${moduleName}/web/${subModuleName}</filePath>
+	<fileName>${ClassName}Controller.java</fileName>
+	<content><![CDATA[
+/**
+ * 
+ */
+package ${packageName}.${moduleName}.web<#if subModuleName != "">.${subModuleName}</#if>;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.gtzn.common.persistence.Ajax;
+import com.gtzn.common.persistence.Pager;
+import com.gtzn.common.web.BaseController;
+import com.gtzn.common.utils.StringUtils;
+import ${packageName}.${moduleName}.entity<#if subModuleName != "">.${subModuleName}</#if>.${ClassName};
+import ${packageName}.${moduleName}.service<#if subModuleName != "">.${subModuleName}</#if>.${ClassName}Service;
+
+/**
+ * ${functionName}Controller
+ * @author ${functionAuthor}
+ * @version ${functionVersion}
+ */
+@Controller
+@RequestMapping(value = "/${urlPrefix}")
+public class ${ClassName}Controller extends BaseController {
+
+	@Autowired
+	private ${ClassName}Service ${className}Service;
+
+
+	@RequiresPermissions("${permissionPrefix}:view")
+	@RequestMapping(value = {"list"})
+	public String list(${ClassName} ${className}, Model model) {
+		return "${lastPackageName}/${moduleName}/${className}/${className}List";
+	}
+	
+	@RequiresPermissions("${permissionPrefix}:view")
+	@RequestMapping(value = {"load"})
+	@ResponseBody
+	public Pager<${ClassName}> load(Pager<${ClassName}> pager, ${ClassName} ${className},HttpServletRequest request,HttpServletResponse response) {
+		Pager<${ClassName}> page = ${className}Service.findPage(pager, ${className}); 
+		return page;
+	}
+	@RequiresPermissions("${permissionPrefix}:view")
+	@RequestMapping(value = "addForm")
+	public String addForm(${ClassName} ${className}, Model model) {
+		model.addAttribute("${className}", ${className});
+		return "${lastPackageName}/${moduleName}/${className}/${className}AddForm";
+	}
+
+	@RequiresPermissions("${permissionPrefix}:view")
+	@RequestMapping(value = "editForm")
+	public String editForm(${ClassName} ${className}, Model model) {
+		${className} = ${className}Service.select${ClassName}Info(${className});
+		model.addAttribute("${className}", ${className});
+		return "${lastPackageName}/${moduleName}/${className}/${className}EditForm";
+	}
+
+	@RequiresPermissions("${permissionPrefix}:edit")
+	@RequestMapping(value = "save")
+	@ResponseBody
+	public Ajax save(${ClassName} ${className}, Model model) {
+		${className}Service.save(${className});
+		return new Ajax(true,  "保存${functionNameSimple}成功");
+	}
+
+	@RequiresPermissions("${permissionPrefix}:edit")
+	@RequestMapping(value = "save2")
+	public String save2(${ClassName} ${className}, Model model, RedirectAttributes redirectAttributes) {
+		if (!beanValidator(model, ${className})){
+			return editForm(${className}, model);
+		}
+		${className}Service.save(${className});
+		addMessage(redirectAttributes, "保存${functionNameSimple}成功");
+		return "redirect:"+ "/${viewPrefix}/?repage";
+	}
+
+	@RequiresPermissions("${permissionPrefix}:edit")
+	@RequestMapping(value = "delete")
+	@ResponseBody
+	public Ajax delete(${ClassName} ${className}) {
+		try {
+			${className}Service.delete${ClassName}Info(${className});
+			return new Ajax(true, "删除${functionNameSimple}成功");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new Ajax(false, "删除${functionNameSimple}异常");
+		}
+	}
+
+	@RequiresPermissions("${permissionPrefix}:edit")
+	@RequestMapping(value = "multiDel")
+	@ResponseBody
+	public Ajax multiDel(String[] idList) {
+		try {
+			${className}Service.batchDelete(idList);
+			return new Ajax(true, "删除${functionNameSimple}成功");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new Ajax(false, "删除${functionNameSimple}异常");
+		}
+	}
+
+}]]>
+	</content>
+</template>

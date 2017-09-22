@@ -1,0 +1,273 @@
+a {
+blr:expression(this.onFocus=this.blur());
+}
+a:focus {
+outline:none;
+-moz-outline:none;
+}
+.filterinput{
+    background-color:rgba(249, 244, 244, 0);
+    border-radius:15px;
+    width:90%;
+    height:30px;
+    border:thin solid #FFF;
+    text-indent:0.5em;
+    font-weight:bold;
+}
+#demo-list {
+	padding-top: 10px;
+}
+#demo-list a{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    -o-text-overflow:ellipsis;
+    white-space:nowrap;
+    width:100%;
+    font-size: 13px;
+}
+#demo-list #first-menu {
+/* 	margin: 4px 0; */
+}
+#demo-list #first-menu:hover {
+	background-color: #064274;
+}
+
+.jquery-accordion-menu,.jquery-accordion-menu * {
+	font-family: "Microsoft Yahei", Helvetica, Arial, sans-serif;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	outline: 0;
+}
+
+.jquery-accordion-menu {
+	float: left;
+	position: relative;
+}
+
+.jquery-accordion-menu ul {
+	margin: 0;
+	padding: 0;
+	list-style: none
+}
+
+.jquery-accordion-menu ul li {
+	width: 100%;
+	display: block;
+	float: left;
+	position: relative
+}
+
+.jquery-accordion-menu ul li a {
+	width: 100%;
+	padding: 14px 22px;
+	float: left;
+	text-decoration: none;
+	font-size: 0.75em;
+	white-space: nowrap;
+	position: relative;
+	overflow: hidden;
+	-o-transition: color .2s linear,background .2s linear;
+	-moz-transition: color .2s linear,background .2s linear;
+	-webkit-transition: color .2s linear,background .2s linear;
+	transition: color .2s linear,background .2s linear
+}
+.jquery-accordion-menu ul li a i {
+	width: 24px;
+	float: left;
+	line-height: 18px;
+	font-size: 18px;
+	text-align: left;
+	color: #fff;
+}
+.jquery-accordion-menu .submenu-indicator {
+	float: right;
+	right: 15px;
+	position: absolute;
+	line-height: 18px;
+	font-size: 20px;
+	-o-transition: transform .3s linear;
+	-moz-transition: transform .3s linear;
+	-webkit-transition: transform .3s linear;
+	-ms-transition: transform .3s linear
+}
+
+.jquery-accordion-menu ul ul.submenu .submenu-indicator {
+	line-height: 10px
+}
+
+.jquery-accordion-menu .submenu-indicator-minus>.submenu-indicator {
+	-ms-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	-webkit-transform: rotate(45deg);
+	transform: rotate(45deg)
+}
+
+.jquery-accordion-menu ul ul.submenu,.jquery-accordion-menu ul ul.submenu li ul.submenu {
+	width: 100%;
+	display: none;
+	position: static
+}
+
+.jquery-accordion-menu ul ul.submenu li {
+	clear: both;
+	width: 100%
+}
+
+
+
+.jquery-accordion-menu ul ul.submenu li a {
+	width: 100%;
+	float: left;
+	background: #f5f5f5;
+	border-top: none;
+	position: relative;
+	-o-transition: border .2s linear;
+	-moz-transition: border .2s linear;
+	-webkit-transition: border .2s linear;
+	transition: border .2s linear
+}
+.jquery-accordion-menu ul ul.submenu li a:hover {
+	background: #ededed;
+}
+.jquery-accordion-menu ul ul.submenu li a {
+	padding-left: 44px
+}
+.jquery-accordion-menu ul ul.submenu li ul li a {
+	padding-left: 60px
+}
+
+.jquery-accordion-menu ul ul.submenu li .jquery-accordion-menu-label {
+	top: 12px
+}
+
+.ink {
+	display: block;
+	position: absolute;
+	background: rgba(255,255,255,.3);
+	border-radius: 100%;
+	-webkit-transform: scale(0);
+	-moz-transform: scale(0);
+	-ms-transform: scale(0);
+	-o-transform: scale(0);
+	transform: scale(0)
+}
+
+.animate-ink {
+	-webkit-animation: ripple .5s linear;
+	-moz-animation: ripple .5s linear;
+	-ms-animation: ripple .5s linear;
+	-o-animation: ripple .5s linear;
+	animation: ripple .5s linear
+}
+
+@-webkit-keyframes ripple {
+	100% {
+		opacity: 0;
+		-webkit-transform: scale(2.5)
+	}
+}
+
+@-moz-keyframes ripple {
+	100% {
+		opacity: 0;
+		-moz-transform: scale(2.5)
+	}
+}
+
+@-o-keyframes ripple {
+	100% {
+		opacity: 0;
+		-o-transform: scale(2.5)
+	}
+}
+
+@keyframes ripple {
+	100% {
+		opacity: 0;
+		transform: scale(2.5)
+	}
+}
+
+/*@media screen and (max-width: 767px) {
+	.jquery-accordion-menu ul li a {
+		padding: 10px 0;
+	}
+	.jquery-accordion-menu ul li a i {
+		max-width: 12px;
+		font-size: 12px;
+		margin-right: 4px;
+		margin-top: -2px;
+		vertical-align: top;
+	}
+	.jquery-accordion-menu .submenu-indicator {
+		font-size: 13px;
+		line-height: 12px;
+		right: 8px;
+	}
+	.jquery-accordion-menu ul li a {
+		font-size: 0.625em;
+	}
+	.jquery-accordion-menu ul ul.submenu>li>a {
+	padding-left: 20px
+}
+}
+*/
+.left-nav {
+	float: left;
+	width: 100%;
+	height: 100%;
+	overflow:hidden;
+}
+.left-nav a {
+	color: #fff !important;
+}
+.submenu-indicator-minus {
+	background: #c8000a;
+}
+#first-menu .submenu-indicator-minus {
+	color: #fff !important;
+	font-weight: bold;
+}
+
+.submenu .second-menu {
+	background: #f5f5f5;
+}
+/*.submenu .second-menu ul li {
+	border-left: 1px solid #c7000a;
+}*/
+#second-menu .submenu-indicator-minus {
+	color: #485a6a !important;
+	/*border-left: 1px solid #c7000a;*/
+	background-color: #ebebeb;
+	/*border-top: 1px solid #dddddd;*/
+}
+#third-menu .lista_first {
+	background-color: #ebebeb;
+	font-weight: normal;
+	padding-left: 54px;
+}
+
+#third-menu a:hover {
+	background-color: #e2e2e2;
+}
+.submenu-indicator-minus i {
+	color: #fff !important;
+}
+#third-menu li:last-child {
+	/*border-bottom: 1px solid #ddd;*/
+}
+
+#second-menu .active {
+	border-left: 2px solid #c7000a;
+	background-color: #fff !important;
+	font-weight: bold;
+}
+
+.active #third-menu .lista_first {
+	background-color: #fff;
+}
+
+#second-menu li a {
+	padding: 10px 36px;
+}

@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gtzn.modules.home.dao.NoticeInfoDao">
+    
+	<sql id="noticeInfoColumns">
+		a.id AS "id",
+		a.title AS "title",
+		a.type AS "type",
+		a.content AS "content",
+		a.date AS "date",
+		a.office AS "office",
+		a.gkflag AS "gkflag",
+		a.ext AS "ext"
+	</sql>
+	
+	<sql id="noticeInfoJoins">
+	</sql>
+    
+	<select id="get" resultType="NoticeInfo">
+		SELECT 
+			<include refid="noticeInfoColumns"/>
+		FROM plat_notice_info a
+		<include refid="noticeInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findPage" resultType="NoticeInfo">
+		SELECT 
+			<include refid="noticeInfoColumns"/>
+		FROM plat_notice_info a
+		<include refid="noticeInfoJoins"/>
+		<where>
+			
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if> 
+			
+			<if test="type != null and type != ''">
+				AND a.type LIKE 
+					<if test="dbName == 'oracle'">'%'||#{type}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{type}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{type},'%')</if>
+			</if>
+			
+			<if test="stime != null and stime != ''">
+                and date_format(a.date,'%Y-%m-%d') &gt;= date_format(#{stime},'%Y-%m-%d')
+            </if>
+            <if test="etime != null and etime != ''">
+                and date_format(a.date,'%Y-%m-%d') &lt;= date_format(#{etime},'%Y-%m-%d')
+
+            </if>
+			
+			
+			<if test="longInUser != null">
+				<if test="longInUser.office!= null">
+					<if test="longInUser.office.id != ''">
+					AND 
+					(
+						  a.office LIKE
+							<if test="dbName == 'oracle'">'%'||#{longInUser.office.id}||'%'</if>
+							<if test="dbName == 'mssql'">'%'+#{longInUser.office.id}+'%'</if>
+							<if test="dbName == 'mysql'">concat('%',#{longInUser.office.id},'%')</if>
+						  or a.gkflag='1'	
+					)
+					</if>		
+				</if>
+			</if>
+			
+		</where>
+		ORDER BY a.date DESC
+			<include refid="common.mysql_page" />
+	</select>
+	<select id="findCount" resultType="int">
+		SELECT 
+			count(a.id)
+		FROM plat_notice_info a
+		<include refid="noticeInfoJoins"/>
+		<where>
+			
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+		</where>
+		ORDER BY a.date DESC
+	</select>
+	
+	<select id="findAllList" resultType="NoticeInfo">
+		SELECT 
+			<include refid="noticeInfoColumns"/>
+		FROM plat_notice_info a
+		<include refid="noticeInfoJoins"/>
+		<where>
+			
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+		</where>		
+	</select>
+	
+	
+	<select id="findTopN" resultType="NoticeInfo">
+		SELECT 
+			<include refid="noticeInfoColumns"/>
+		FROM plat_notice_info a
+		<include refid="noticeInfoJoins"/>
+		<where>
+			<if test="noticeinfo.longInUser.office != null and noticeinfo.longInUser.office.id != ''">
+					 a.office LIKE
+						<if test="noticeinfo.dbName == 'oracle'">'%'||#{noticeinfo.longInUser.office.id}||'%'</if>
+						<if test="noticeinfo.dbName == 'mssql'">'%'+#{noticeinfo.longInUser.office.id}+'%'</if>
+						<if test="noticeinfo.dbName == 'mysql'">concat('%',#{noticeinfo.longInUser.office.id},'%')</if>
+					 or a.gkflag='1'	
+			</if>
+		</where>
+		ORDER BY a.date DESC limit #{topN}
+	</select>
+	
+
+	<insert id="insert">
+		INSERT INTO plat_notice_info
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			  id,
+			  title,
+			  type,
+			  content,
+			  date,
+			  office,
+			  gkflag,
+			  ext,
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			  #{id,jdbcType=INTEGER},
+			  #{title,jdbcType=VARCHAR},
+			  #{type,jdbcType=VARCHAR},
+			  #{content,jdbcType=VARCHAR},
+			  #{date,jdbcType=TIMESTAMP},
+			  #{office,jdbcType=VARCHAR},
+			  #{gkflag,jdbcType=VARCHAR},
+			  #{ext,jdbcType=VARCHAR},
+		</trim>
+	</insert>
+	
+	<insert id="insertSelective">
+		INSERT INTO plat_notice_info
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+			  id,
+			</if>
+			<if test="title != null and title != ''">
+			  title,
+			</if>
+			<if test="type != null and type != ''">
+			  type,
+			</if>
+			<if test="content != null and content != ''">
+			  content,
+			</if>
+			<if test="date != null and date != ''">
+			  date,
+			</if>
+			<if test="office != null and office != ''">
+			  office,
+			</if>
+			<if test="gkflag != null and gkflag != ''">
+			  gkflag,
+			</if>
+			<if test="ext != null and ext != ''">
+			  ext,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id != null and id != ''">
+			  #{id,jdbcType=INTEGER},
+			</if>
+			<if test="title != null and title != ''">
+			  #{title,jdbcType=VARCHAR},
+			</if>
+			<if test="type != null and type != ''">
+			  #{type,jdbcType=VARCHAR},
+			</if>
+			<if test="content != null and content != ''">
+			  #{content,jdbcType=VARCHAR},
+			</if>
+			<if test="date != null and date != ''">
+			  #{date,jdbcType=TIMESTAMP},
+			</if>
+			<if test="office != null and office != ''">
+			  #{office,jdbcType=VARCHAR},
+			</if>
+			<if test="gkflag != null and gkflag != ''">
+			  #{gkflag,jdbcType=VARCHAR},
+			</if>
+			<if test="ext != null and ext != ''">
+			  #{ext,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="update" parameterType="NoticeInfo">
+		UPDATE plat_notice_info
+		 	<set>
+				title = #{title,jdbcType=VARCHAR},
+				type = #{type,jdbcType=VARCHAR},
+				content = #{content,jdbcType=VARCHAR},
+				date = #{date,jdbcType=TIMESTAMP},
+				office = #{office,jdbcType=VARCHAR},
+				gkflag = #{gkflag,jdbcType=VARCHAR},
+				ext = #{ext,jdbcType=VARCHAR},
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateSelective" parameterType="NoticeInfo">
+		UPDATE plat_notice_info
+		 	<set>
+				<if test="title != null and title != ''">
+				  title = #{title,jdbcType=VARCHAR},
+				</if>
+				<if test="type != null and type != ''">
+				  type = #{type,jdbcType=VARCHAR},
+				</if>
+				<if test="content != null and content != ''">
+				  content = #{content,jdbcType=VARCHAR},
+				</if>
+				<if test="date != null and date != ''">
+				  date = #{date,jdbcType=TIMESTAMP},
+				</if>
+				<if test="office != null and office != ''">
+				  office = #{office,jdbcType=VARCHAR},
+				</if>
+				<if test="gkflag != null and gkflag != ''">
+				  gkflag = #{gkflag,jdbcType=VARCHAR},
+				</if>
+				<if test="ext != null and ext != ''">
+				  ext = #{ext,jdbcType=VARCHAR},
+				</if>
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM plat_notice_info
+		WHERE id = #{id}
+	</update>
+
+	<update id="batchDelete">
+		DELETE FROM plat_notice_info
+		WHERE id in
+		<if test="idList != null" >
+			<foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+			   #{item}
+			</foreach>
+   		 </if>
+	</update>
+
+	<insert id="batchInsert">
+			INSERT INTO plat_notice_info
+			<trim prefix="(" suffix=")" suffixOverrides="," >
+					id,
+					title,
+					type,
+					content,
+					date,
+					ext,
+			</trim>
+			VALUES
+			<foreach collection="list" item="item" index="index" separator="," >
+				<trim prefix="(" suffix=")" suffixOverrides="," >
+							#{item.id},
+							#{item.title},
+							#{item.type},
+							#{item.content},
+							#{item.date},
+							#{item.ext},
+				</trim>
+			</foreach>
+	</insert>
+
+	<update id="executeUpdate" parameterType="java.lang.String">
+		#{sql}
+	</update>
+<select id="notePage" parameterType="java.util.Map"
+		resultType="com.gtzn.modules.home.entity.NoticeInfo">
+	    select * from(select
+	   <include refid="noticeInfoColumns"/>,'(公告管理)' as tname
+			FROM
+			  plat_notice_info a
+			  <where>
+			   <if test="m.titleCont != null and m.titleCont != ''" >
+					     and (a.title like 
+					concat('%',#{m.titleCont},'%')
+					or a.content like
+					concat('%',#{m.titleCont},'%')
+					)
+			  </if>
+			  </where>
+		order by  a.date desc) row_ limit #{m.start}, #{m.rows}
+	</select>
+	<select id="noteCount" resultType="int" parameterType="java.util.Map">
+		SELECT 
+			count(a.id)
+		FROM plat_notice_info a
+		<where>
+		 <if test="m.titleCont != null and m.titleCont != ''" >
+					     and (a.title like 
+					concat('%',#{m.titleCont},'%')
+					or a.content like
+					concat('%',#{m.titleCont},'%')
+					)
+			  </if>
+		</where>
+	</select>
+</mapper>

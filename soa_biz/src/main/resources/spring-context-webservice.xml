@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
+    <!--xFire调用方式-->
+    <bean id="xFireService" class="com.gtzn.soa.service.impl.WebServiceXFireImpl">
+        <property name="serverAddress" value="http://***:port/services/service?wsdl"/>
+    </bean>
+    <!--axis调用方式-->
+    <bean id="axisService" class="com.gtzn.soa.service.impl.WebServiceAxisImpl">
+        <property name="serverAddress" value="http://***:port/services/service?wsdl"/>
+    </bean>
+    <!--CXF调用方式-->
+    <bean id="cxfService" class="com.gtzn.soa.service.impl.WebServiceCXFImpl">
+        <property name="serverAddress" value="http://***:port/services/service?wsdl"/>
+    </bean>
+
+    <!--以下是业务相关的远程调用service,每个wsdl对应一个服务模块-->
+    <!--登录验证-->
+    <bean id="loginService" class="com.gtzn.soa.service.impl.WebServiceAxisImpl">
+        <property name="debug" value="false"/>
+        <property name="nameSpace" value="http://webservice.ws.gt.com"/>
+        <property name="serverAddress" value="http://192.168.13.220:8080/gtws/services/LoginService?wsdl"/>
+    </bean>
+    <!--监控图片查询-->
+    <bean id="platPhotoService" class="com.gtzn.soa.service.impl.WebServiceAxisImpl">
+        <property name="debug" value="false"/>
+        <property name="nameSpace" value="http://webservice.ws.gt.com"/>
+        <property name="serverAddress" value="http://192.168.13.220:8080/gtws/services/PlatformService?wsdl"/>
+    </bean>
+    <!--报警查询-->
+<!--     <bean id="alarmService" class="com.gtzn.soa.service.impl.WebServiceAxisImpl">
+        <property name="debug" value="false"/>
+        <property name="nameSpace" value="http://webservice.ws.gt.com"/> 
+        <property name="serverAddress" value="http://192.168.13.220:8080/gtws/services/AlarmService?wsdl"/>
+    </bean> -->
+</beans>

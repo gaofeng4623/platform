@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gtzn.modules.digital.dao.ArchiveClassDao" >
+  <resultMap id="BaseResultMap" type="com.gtzn.modules.digital.entity.ArchiveClass" >
+    <result column="name" property="name" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, title
+  </sql>
+  <select id="queryArchiveClassList" parameterType="String"
+		resultType="com.gtzn.modules.digital.entity.ArchiveClass">
+	   select name,id from  y_archiveclass
+	</select>
+	 <select id="toreList" parameterType="java.util.Map"
+		resultType="com.gtzn.modules.digital.entity.ArchiveClass">
+	   select b.name as toreName ,b.tblname as toreTblname,c.fieldname from  y_archivestore b,y_templatefield c
+	   <where>
+	   	     b.template_id=c.template_id and c.fieldpro=#{m.fieldpro} and b.class_id=#{m.classId}
+	   	     <if test="m.datype != null and m.datype != ''">
+				AND (b.datype='卷内文件' or b.datype='一文一件')
+			</if>
+	   </where>
+	   
+	</select>
+	 <select id="toreNdList" parameterType="java.util.Map"
+		resultType="com.gtzn.modules.digital.entity.ArchiveClass">
+	   select distinct b.name as toreName ,b.tblname as toreTblname,c.fieldname from  y_archivestore b,y_templatefield c
+	   <where>
+	   	     b.template_id=c.template_id and c.fieldpro=(#{m.nd},#{m.stfs}) and b.class_id=#{m.classId}
+	   	     <if test="m.datype != null and m.datype != ''">
+				AND (b.datype='卷内文件' or b.datype='一文一件')
+			</if>
+	   </where>
+	   
+	</select>
+	<select id="toreIdeaList" parameterType="java.util.Map"
+		resultType="com.gtzn.modules.digital.entity.ArchiveClass">
+	   select b.name as toreName ,b.tblname as toreTblname from y_archivestore b
+	   <where>
+	    <if test="m.classId != null and m.classId != ''">
+	    b.class_id=#{m.classId} and (b.datype='卷内文件' or b.datype='一文一件')
+	    </if>
+	   </where>
+	    
+	   
+	</select>
+	
+	<!--  <select id="toreList" parameterType="String"
+		resultType="com.gtzn.modules.digital.entity.ArchiveClass">
+	   select b.name,b.tblname from  y_archiveclass a,y_archivestore b
+	   where a.id=b.class_id
+	</select> -->
+	<select id="countD" parameterType="java.util.Map"
+		resultType="String" statementType="STATEMENT"> 
+	   select sum((a.count)) as Dcount  from(select  case when ${m.fieldname} is null then 0
+   else sum(0+${m.fieldname}) end as count from ${m.d} where DEL_FLAG='0' group by ${m.fieldname})a
+	    
+	</select>
+	<select id="countIsNull" parameterType="java.util.Map"
+		resultType="java.lang.Integer" statementType="STATEMENT"> 
+	   select count(*) as Dcount from  ${m.d1} 
+	     <where>
+	      <if test="m.st != null and m.st != ''">
+	      DEL_FLAG='0'
+	     </if>
+	      <if test="m.dz != null and m.dz != ''">
+	       DELFLAG='0'
+	     </if>
+	    </where>
+	</select>
+	<select id="countIdea" parameterType="java.util.Map"
+		resultType="java.lang.Integer" statementType="STATEMENT"> 
+	    select count(*) from ${m.d} 
+	    <where>
+	     DELFLAG='0'
+	    </where>
+	</select>
+	<select id="ListNd" parameterType="java.util.Map"
+		resultType="com.gtzn.modules.digital.entity.ArchiveClass" statementType="STATEMENT"> 
+	    select sum(${m.fieldname}+0) countEntityNo,nd from ${m.d} 
+	    <where>
+	    <if test="m.entityNo != null and m.entityNo != ''">
+	     DEL_FLAG='0' GROUP BY nd
+	    </if>
+	     <if test="m.electronicsNo != null and m.electronicsNo != ''">
+	     DELFLAG='0' GROUP BY nd
+	    </if>
+	    </where>
+	</select>
+	<select id="counNd" parameterType="java.util.Map"
+		resultType="java.lang.Integer" statementType="STATEMENT"> 
+	    select count(d1.id)  from ${m.d} d,${m.d1} d1
+	    <where>
+	      d.id=d1.recid  
+	      <if test="m.nd != null and m.nd != ''">
+	      and d.nd='${m.nd}'
+	    </if>
+	       <if test="m.qzh != null and m.qzh != ''">
+	      and  d.qzh='${m.qzh}'
+	    </if>
+	    and d1.DELFLAG='0' and d.DEL_FLAG='0'
+	    </where>
+	</select>
+	<select id="queryUnitList" parameterType="String"
+		resultType="com.gtzn.modules.digital.entity.ArchiveClass">
+	   select unitCode,unitName from  y_unit
+	</select>
+	 <select id="toreUnitList" parameterType="java.util.Map"
+		resultType="com.gtzn.modules.digital.entity.ArchiveClass">
+		select distinct b.name,b.tblname as toreTblname,c.fieldname fieldname,c.fieldpro from y_archivestore b, y_templatefield c
+	   <where>
+	   	    c.fieldpro in(
+	   	    <if test="m.nd != null and m.nd != ''">
+	   	       #{m.nd},
+	   	     </if>
+	   	     <if test="m.bgqx != null and m.bgqx != ''">
+	   	       #{m.bgqx},
+	   	     </if>
+	   	     <if test="m.mj != null and m.mj != ''">
+	   	       #{m.mj}
+	   	     </if>
+	   	    <if test="m.qzh != null and m.qzh != ''">
+	   	       #{m.qzh},
+	   	     </if>
+	   	     <if test="m.stfs != null and m.stfs != ''">
+	   	       #{m.stfs}
+	   	     </if>
+	   	  
+	   	    )  and c.template_id=b.template_id 
+	   	    <if test="m.datype != null and m.datype != ''">
+				AND (b.datype='卷内文件' or b.datype='一文一件')
+			</if>
+	   	     <if test="m.classId != null and m.classId != ''">
+				 and b.class_id=#{m.classId}
+			</if>
+			ORDER BY b.name
+	   </where>
+	   
+	</select>
+	<select id="countUnitList" parameterType="java.util.Map"
+		resultType="com.gtzn.modules.digital.entity.ArchiveClass" statementType="STATEMENT">
+		
+        select 
+           <if test="m.datype == 'st'">
+        sum(${m.ztsl}+0) Dcount,
+           </if>
+          ${m.nd} from ${m.d}  where qzh='${m.qzh}'
+          <if test="m.datype =='st' ">
+          and DEL_FLAG='0'
+          </if>
+           <if test="m.datype =='dz' ">
+          and DELFLAG='0'
+          </if>
+         GROUP BY ${m.nd}
+	   
+	</select>
+	<select id="countUnitDzList" parameterType="java.util.Map"
+		resultType="com.gtzn.modules.digital.entity.ArchiveClass" statementType="STATEMENT">
+       select count(id) from ${m.d} d,${m.d2} d2
+     where d.id=d2.recid and nd='${m.nd}' and qzh='${m.qzh}'
+	</select>
+	
+	<select id="Librarycoun" parameterType="java.util.Map"
+		resultType="java.lang.Integer" statementType="STATEMENT"> 
+    SELECT count(id)  from ${m.d} where qzh in(${m.qzh}) 	   
+   <if test="m.zk =='zk' ">
+         and SHELFSTATE='1'
+    </if>
+     <if test="m.zk =='wzk' ">
+         and SHELFSTATE !='1'
+    </if>
+    and DEL_FLAG='0'
+	</select>
+	<select id="dict" parameterType="java.util.Map"
+		resultType="com.gtzn.modules.digital.entity.ArchiveClass"> 
+    SELECT label as lable  from sys_dict where type=#{m.type}	   
+	</select>
+	<select id="bgqxCount" parameterType="java.util.Map"
+		resultType="String" statementType="STATEMENT"> 
+       select sum((a.count)) as Dcount  from(select  case when ${m.ztsl} is null then 0
+   else sum(0+${m.ztsl}) end as count from ${m.d} where DEL_FLAG='0' and ${m.file} in('${m.fileName}') group by ${m.ztsl})a
+	</select>
+<select id="bgqxDzCount" parameterType="java.util.Map"
+		resultType="String" statementType="STATEMENT"> 
+	    select count(d1.id)  from ${m.d} d,${m.d1} d1
+	    <where>
+	      d.id=d1.recid  
+	       <if test="m.file != null and m.file != ''">
+	      and  d.${m.file} in ('${m.fileName}')
+	    </if>
+	    and d1.DELFLAG='0' and d.DEL_FLAG='0'
+	    </where>
+	</select>
+	<select id="transfer" parameterType="String"
+		resultType="com.gtzn.modules.digital.entity.ArchiveClass" statementType="STATEMENT">
+      select sum(outcount) as outCount,outunit from y_archiveaccept GROUP BY outunit
+	</select>
+</mapper>
